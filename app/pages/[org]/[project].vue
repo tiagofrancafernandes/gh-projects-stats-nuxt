@@ -161,6 +161,7 @@ function handleDragEnd() {
                 <div class="flex items-center gap-4">
                     <button
                         @click="refresh"
+                        data-tooltip="Refresh"
                         class="p-2.5 rounded-xl border border-zinc-800 hover:bg-zinc-900 text-zinc-400 transition-all"
                     >
                         <iconify-icon
@@ -170,6 +171,7 @@ function handleDragEnd() {
                     </button>
                     <button
                         @click="focusMode = true"
+                        data-tooltip="TV Mode"
                         class="p-2.5 rounded-xl border border-zinc-800 hover:bg-zinc-900 text-zinc-400 transition-all"
                     >
                         <iconify-icon icon="mdi:monitor-dashboard"></iconify-icon>
@@ -177,6 +179,7 @@ function handleDragEnd() {
                     <div class="h-6 w-[1px] bg-zinc-800 mx-2"></div>
                     <button
                         @click="isFiltersOpen = true"
+                        data-tooltip="Filters"
                         class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-100 text-zinc-900 font-bold text-sm hover:bg-white transition-all shadow-xl shadow-white/5"
                     >
                         <iconify-icon icon="mdi:filter-variant" class="text-lg"></iconify-icon>
@@ -190,6 +193,7 @@ function handleDragEnd() {
         <button
             v-if="focusMode"
             @click="focusMode = false"
+            data-tooltip="Exit TV Mode"
             class="fixed bottom-8 right-8 z-50 p-4 rounded-full bg-zinc-900/80 backdrop-blur border border-zinc-800 text-zinc-500 hover:text-white transition-all opacity-20 hover:opacity-100"
         >
             <iconify-icon icon="mdi:close" class="text-2xl"></iconify-icon>
@@ -453,6 +457,7 @@ function handleDragEnd() {
         <button
             v-if="!focusMode"
             @click="isFiltersOpen = true"
+            data-tooltip="Dashboard Layout"
             class="fixed bottom-8 left-8 p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-white transition-all shadow-2xl"
         >
             <iconify-icon icon="mdi:view-dashboard-edit" class="text-xl"></iconify-icon>

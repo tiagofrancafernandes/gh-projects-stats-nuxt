@@ -1,1 +1,39 @@
 @import 'tailwindcss';
+
+button:not([disabled]):not([readonly]) {
+    cursor: pointer;
+}
+
+/* Tooltip Styles */
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    padding: 6px 10px;
+    background: rgba(9, 9, 11, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(39, 39, 42, 0.5);
+    color: #e4e4e7;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+[data-tooltip]:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}

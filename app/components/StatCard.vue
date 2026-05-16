@@ -29,6 +29,7 @@ defineEmits(['expand']);
             <div class="flex items-center gap-2">
                 <button
                     @click.stop="$emit('expand')"
+                    :data-tooltip="isExpanded ? 'Minimize' : 'Expand'"
                     class="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-all"
                 >
                     <iconify-icon
