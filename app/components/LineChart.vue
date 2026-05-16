@@ -114,14 +114,14 @@ const chartOptions = computed(() => ({
                 <div class="flex items-center gap-1">
                     <button
                         @click.stop="isEditing = true"
-                        data-tooltip="Configure"
+                        v-tippy="'Configure'"
                         class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm px-2"
                     >
                         <iconify-icon icon="mdi:cog" class="text-base text-zinc-500"></iconify-icon>
                     </button>
                     <button
                         @click.stop="$emit('expand')"
-                        :data-tooltip="isExpanded ? 'Minimize' : 'Expand'"
+                        v-tippy="isExpanded ? 'Minimize' : 'Expand'"
                         class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm px-2"
                     >
                         <iconify-icon

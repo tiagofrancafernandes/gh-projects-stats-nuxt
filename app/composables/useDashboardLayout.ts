@@ -5,6 +5,10 @@ export interface LayoutItem {
     cols: number; // 1 to 4
     path?: string; // JSON path in stats object
     type?: 'stat' | 'chart' | 'gauge' | 'list' | 'pie';
+    showValue?: boolean;
+    showLabel?: boolean;
+    format?: 'fixed' | 'percent';
+    precision?: number;
 }
 
 export interface DashboardView {
@@ -16,10 +20,54 @@ export interface DashboardView {
 
 export function useDashboardLayout() {
     const defaultLayout: LayoutItem[] = [
-        { id: 'total', title: 'Total Items', visible: true, cols: 1, path: 'total', type: 'stat' },
-        { id: 'open', title: 'Open Items', visible: true, cols: 1, path: 'open', type: 'stat' },
-        { id: 'closed', title: 'Closed Items', visible: true, cols: 1, path: 'closed', type: 'stat' },
-        { id: 'merged', title: 'Merged PRs', visible: true, cols: 1, path: 'merged', type: 'stat' },
+        {
+            id: 'total',
+            title: 'Total Items',
+            visible: true,
+            cols: 1,
+            path: 'total',
+            type: 'stat',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+        },
+        {
+            id: 'open',
+            title: 'Open Items',
+            visible: true,
+            cols: 1,
+            path: 'open',
+            type: 'stat',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+        },
+        {
+            id: 'closed',
+            title: 'Closed Items',
+            visible: true,
+            cols: 1,
+            path: 'closed',
+            type: 'stat',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+        },
+        {
+            id: 'merged',
+            title: 'Merged PRs',
+            visible: true,
+            cols: 1,
+            path: 'merged',
+            type: 'stat',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+        },
         {
             id: 'velocity_gauge',
             title: 'Current Velocity',
@@ -27,6 +75,10 @@ export function useDashboardLayout() {
             cols: 1,
             path: 'weeklyVelocity',
             type: 'gauge',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
         },
         { id: 'velocity', title: 'Velocity Chart', visible: true, cols: 3, path: 'velocity', type: 'chart' },
         { id: 'status', title: 'Status Chart', visible: true, cols: 2, path: 'byStatus', type: 'pie' },
