@@ -24,5 +24,9 @@ export default defineNuxtConfig({
         githubToken: process.env.GITHUB_TOKEN,
         allowGithubViaOAuth: ['true', '1', 'on', true].includes(process.env.GITHUB_VIA_OAUTH ?? false),
         mockOrgsAllowed: ['true', '1', 'on', true].includes(process.env.MOCK_ORGS_ALLOWED ?? false),
+
+        defaultOrg: String((process.env.DEFAULT_GITHUB_ORG ?? process.env.DEFAULT_GITHUB_OWNER) || ''),
+        defaultOwner: String((process.env.DEFAULT_GITHUB_OWNER ?? process.env.DEFAULT_GITHUB_ORG) || ''),
+        defaultProject: process.env.DEFAULT_GITHUB_PROJECT,
     },
 });

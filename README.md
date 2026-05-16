@@ -36,9 +36,9 @@ Create a `.env` file in the root directory:
 
 ```env
 GITHUB_TOKEN=your_github_pat
-# Optional defaults
-GITHUB_ORG=your_org_or_user
-GITHUB_PROJECT=project_number
+## Optional defaults
+DEFAULT_GITHUB_ORG=your_org_or_user
+DEFAULT_GITHUB_PROJECT=project_number
 ```
 
 ### Installation

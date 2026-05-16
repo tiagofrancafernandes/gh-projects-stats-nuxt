@@ -1,29 +1,41 @@
 <template></template>
 
 <script setup lang="ts">
-const defaultProject = {
-    org: 'tiagofrancafernandes',
-    project: 1,
+
+const config = useRuntimeConfig();
+
+const defaultOwner = config.defaultOwner || config.defaultOrg || null;
+const defaultProject = parseInt(config.defaultProject) || null;
+
+if (!defaultOwner || !defaultProject) {
+    await navigateTo({
+        path: '/'
+    });
+}
+
+const defaultValues = {
+    org: defaultOwner,
+    project: defaultProject,
     query: {
         states: 'OPEN',
     },
 };
 
 const targetPath = [
-    defaultProject.org,
-    defaultProject.project,
+    defaultValues.org,
+    defaultValues.project,
     //
 ]
     .filter(Boolean)
-    .join('/');
+    .join('/').trim();
 
 // /tiagofrancafernandes/1?states=OPEN
 await navigateTo({
     // path: targetPath || undefined,
     name: 'org-project',
     params: {
-        org: defaultProject.org,
-        project: defaultProject.project,
+        org: defaultValues.org,
+        project: defaultValues.project,
     },
 });
 </script>
