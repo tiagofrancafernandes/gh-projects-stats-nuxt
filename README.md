@@ -1,5 +1,7 @@
 # GitHub Projects v2 Dashboard
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftiagofrancafernandes%2Fgh-projects-stats-nuxt&env=GITHUB_TOKEN,DEFAULT_GITHUB_OWNER,DEFAULT_GITHUB_ORG,DEFAULT_GITHUB_PROJECT)
+
 A professional, high-performance dashboard for visualizing GitHub Projects v2 metrics. Built with Nuxt 4, Tailwind CSS, and Chart.js.
 
 ## Features
@@ -23,22 +25,46 @@ A professional, high-performance dashboard for visualizing GitHub Projects v2 me
 - **Charts**: [Chart.js](https://www.chartjs.org/) via [vue-chartjs](https://vue-chartjs.org/)
 - **State/Hooks**: [@vueuse/nuxt](https://vueuse.org/)
 
-## Setup
+## Screenshots
 
-### Prerequisites
+![Dashboard Main](./docs/assets/dashboard-main.png)
+*Modern, glassmorphic dashboard with real-time metrics.*
 
-- Node.js (v18+)
-- GitHub Personal Access Token (PAT) with `project` scopes.
+![Layout Manager](./docs/assets/layout-manager.png)
+*Advanced layout management with card grouping and drag-and-drop.*
 
-### Environment Variables
+## Documentation
 
-Create a `.env` file in the root directory:
+Explore our detailed guides in the [docs](./docs/README.md) folder:
+- [Programmable Metrics & Custom Logic](./docs/CUSTOM_LOGIC.md)
+- [View Management & Cloning](./docs/VIEW_MANAGEMENT.md)
+- [Layout & Card Management](./docs/LAYOUT_MANAGEMENT.md)
+- [Backup & Portability (Import/Export)](./docs/IMPORT_EXPORT.md)
+
+## Deployment
+
+### Deploy to Vercel
+
+The easiest way to deploy this dashboard is using Vercel. Click the button above to clone and deploy.
+
+**Important**: You must provide the following environment variables during deployment (or add them later and trigger a redeploy):
+
+| Variable | Description |
+| :--- | :--- |
+| `GITHUB_TOKEN` | Your GitHub Personal Access Token with `project` scopes. |
+| `DEFAULT_GITHUB_OWNER` | Default GitHub username or organization name. |
+| `DEFAULT_GITHUB_ORG` | (Alias for Owner) Default GitHub organization name. |
+| `DEFAULT_GITHUB_PROJECT` | Default project number (e.g., `1`). |
+
+### Environment Variables (.env)
+
+For local development, create a `.env` file in the root directory:
 
 ```env
 GITHUB_TOKEN=your_github_pat
-## Optional defaults
-DEFAULT_GITHUB_ORG=your_org_or_user
-DEFAULT_GITHUB_PROJECT=project_number
+DEFAULT_GITHUB_OWNER=usuario-ou-org
+DEFAULT_GITHUB_ORG=usuario-ou-org
+DEFAULT_GITHUB_PROJECT=1
 ```
 
 ### Installation

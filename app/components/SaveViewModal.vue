@@ -5,7 +5,7 @@ const props = defineProps<{
     viewName?: string;
 }>();
 
-const emit = defineEmits(['close', 'save']);
+const emit = defineEmits(['close', 'save', 'minimize']);
 
 const name = ref(props.viewName || '');
 
@@ -16,9 +16,15 @@ watch(
     }
 );
 
+const isSaveAs = ref(false);
+
 function handleSave() {
-    if (!name.value) return;
-    emit('save', name.value);
+    if (isSaveAs.value || props.currentViewId === 'default') {
+        if (!name.value) return;
+        emit('save', name.value);
+    } else {
+        emit('save', props.viewName);
+    }
 }
 </script>
 
@@ -33,7 +39,7 @@ function handleSave() {
             <div class="p-6 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/50">
                 <h2 class="text-lg font-bold text-zinc-100 flex items-center gap-2">
                     <iconify-icon icon="mdi:content-save-outline" class="text-blue-500"></iconify-icon>
-                    {{ currentViewId === 'default' ? 'Save New View' : 'Update Current View' }}
+                    {{ currentViewId === 'default' || isSaveAs ? 'Save New View' : 'Update Current View' }}
                 </h2>
                 <button @click="$emit('close')" class="btn btn-ghost btn-sm px-2">
                     <iconify-icon icon="mdi:close" class="text-xl"></iconify-icon>
@@ -41,7 +47,7 @@ function handleSave() {
             </div>
 
             <div class="p-6 space-y-6">
-                <div v-if="currentViewId === 'default'" class="space-y-2">
+                <div v-if="currentViewId === 'default' || isSaveAs" class="space-y-2">
                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest ml-1">View Name</label>
                     <input
                         id="view-name"
@@ -54,23 +60,48 @@ function handleSave() {
                     />
                 </div>
                 <div v-else class="py-4 text-center">
-                    <p class="text-zinc-400 text-sm">
+                    <p class="text-zinc-400 text-sm leading-relaxed">
                         You've modified the
                         <span class="text-blue-400 font-bold">"{{ viewName }}"</span>
-                        layout. Would you like to save these changes?
+                        layout.
+                        <br />
+                        Would you like to save these changes?
                     </p>
                 </div>
 
-                <div class="flex gap-3 pt-2">
+                <div class="space-y-3">
+                    <div class="flex gap-3 pt-2">
+                        <button
+                            @click="handleSave"
+                            class="flex-1 btn btn-white py-3 font-bold shadow-lg shadow-blue-500/10"
+                            :disabled="(currentViewId === 'default' || isSaveAs) && !name"
+                        >
+                            {{ currentViewId === 'default' || isSaveAs ? 'Save View' : 'Update Layout' }}
+                        </button>
+                        <button
+                            v-if="currentViewId !== 'default' && !isSaveAs"
+                            @click="isSaveAs = true"
+                            class="flex-1 btn btn-black py-3 font-bold border border-zinc-800"
+                        >
+                            Save As...
+                        </button>
+                        <button
+                            @click="$emit('close')"
+                            class="flex-1 btn btn-ghost py-3 font-bold border border-zinc-800"
+                        >
+                            Discard
+                        </button>
+                    </div>
+
                     <button
-                        @click="handleSave"
-                        class="flex-1 btn btn-white py-3 font-bold shadow-lg shadow-blue-500/10"
-                        :disabled="currentViewId === 'default' && !name"
+                        @click="$emit('minimize')"
+                        class="w-full btn btn-black py-3 font-bold border border-zinc-800 flex items-center justify-center gap-2 group/edit"
                     >
-                        {{ currentViewId === 'default' ? 'Save View' : 'Update Layout' }}
-                    </button>
-                    <button @click="$emit('close')" class="flex-1 btn btn-ghost py-3 font-bold border border-zinc-800">
-                        Discard Changes
+                        <iconify-icon
+                            icon="mdi:pencil-outline"
+                            class="group-hover:rotate-12 transition-transform"
+                        ></iconify-icon>
+                        Continue Editing
                     </button>
                 </div>
             </div>

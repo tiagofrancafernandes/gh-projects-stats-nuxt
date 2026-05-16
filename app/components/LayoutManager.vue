@@ -174,7 +174,9 @@ function moveItem(index: number, direction: 'up' | 'down') {
                                 <div class="text-sm font-bold text-zinc-100 truncate">{{ item.title }}</div>
                                 <div class="text-[10px] text-zinc-600 uppercase font-bold tracking-tighter">
                                     ID: {{ item.id }}
-                                    <span v-if="item.subLabel" class="ml-2 text-blue-500/50">• {{ item.subLabel }}</span>
+                                    <span v-if="item.subLabel" class="ml-2 text-blue-500/50">
+                                        • {{ item.subLabel }}
+                                    </span>
                                 </div>
                             </div>
 

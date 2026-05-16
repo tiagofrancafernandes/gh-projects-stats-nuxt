@@ -21,6 +21,7 @@ const props = defineProps<{
     isExpanded?: boolean;
     showHandle?: boolean;
     path?: string;
+    customFn?: string;
 }>();
 
 const emit = defineEmits(['expand', 'update']);
@@ -28,26 +29,43 @@ const emit = defineEmits(['expand', 'update']);
 const isEditing = ref(false);
 const editTitle = ref(props.title);
 const editPath = ref(props.path || '');
+const editCustomFn = ref(props.customFn || '');
+const useLogic = ref(!!props.customFn);
 
 function save() {
-    emit('update', { title: editTitle.value, path: editPath.value });
+    emit('update', {
+        title: editTitle.value,
+        path: useLogic.value ? undefined : editPath.value,
+        customFn: useLogic.value ? editCustomFn.value : undefined,
+    });
     isEditing.value = false;
 }
 
 function cancel() {
     editTitle.value = props.title;
     editPath.value = props.path || '';
+    editCustomFn.value = props.customFn || '';
+    useLogic.value = !!props.customFn;
     isEditing.value = false;
 }
 
 const chartData = computed(() => {
-    const dataArray = Array.isArray(props.data) ? props.data : [];
+    let labels: string[] = [];
+    let values: number[] = [];
+
+    if (Array.isArray(props.data)) {
+        labels = props.data.map((i: any) => i.date || i.label || 'Unknown');
+        values = props.data.map(
+            (i: any) => (typeof i === 'object' ? (i.closed !== undefined ? i.closed : i.value) : i) || 0
+        );
+    }
+
     return {
-        labels: dataArray.map((d: any) => d.date) || [],
+        labels,
         datasets: [
             {
                 label: 'Items',
-                data: dataArray.map((d: any) => d.closed) || [],
+                data: values,
                 borderColor: '#3b82f6',
                 backgroundColor: (context: any) => {
                     const chart = context.chart;
@@ -164,15 +182,66 @@ const chartOptions = computed(() => ({
                     />
                 </div>
 
-                <div class="space-y-1.5">
-                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Data Path</label>
-                    <input
-                        id="line-path"
-                        name="line-path"
-                        v-model="editPath"
-                        type="text"
-                        class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all font-mono"
-                    />
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                            {{ useLogic ? 'Custom Logic (Async JS)' : 'Data Path' }}
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] font-bold text-zinc-600 uppercase">
+                                {{ useLogic ? 'Logic Enabled' : 'Use Path' }}
+                            </span>
+                            <button
+                                @click="useLogic = !useLogic"
+                                class="w-8 h-4 rounded-full relative transition-colors duration-300 border border-zinc-700"
+                                :class="useLogic ? 'bg-blue-600' : 'bg-zinc-800'"
+                            >
+                                <div
+                                    class="absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-all duration-300"
+                                    :class="useLogic ? 'left-4.5' : 'left-0.5'"
+                                ></div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div v-if="!useLogic">
+                        <input
+                            id="line-path"
+                            name="line-path"
+                            v-model="editPath"
+                            type="text"
+                            placeholder="e.g. weeklyVelocity"
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all font-mono"
+                        />
+                    </div>
+                    <div v-else class="space-y-2">
+                        <div
+                            class="bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden focus-within:border-blue-500/50 transition-all"
+                        >
+                            <div
+                                class="px-3 py-1.5 bg-zinc-900/50 border-b border-zinc-800 flex items-center justify-between"
+                            >
+                                <span class="text-[9px] font-mono text-zinc-500">async (stats, cards) => {</span>
+                                <iconify-icon icon="mdi:javascript" class="text-zinc-600"></iconify-icon>
+                            </div>
+                            <textarea
+                                v-model="editCustomFn"
+                                placeholder="return [{ date: 'Mon', closed: 10 }, ...]"
+                                rows="5"
+                                class="w-full bg-transparent px-3 py-2 text-xs text-blue-400 focus:outline-none font-mono resize-none"
+                            ></textarea>
+                            <div class="px-3 py-1 bg-zinc-900/50 border-t border-zinc-800">
+                                <span class="text-[9px] font-mono text-zinc-500">}</span>
+                            </div>
+                        </div>
+                        <p class="text-[9px] text-zinc-600 leading-tight">
+                            Must return an array
+                            <code class="text-zinc-400">[{date, closed}]</code>
+                            or
+                            <code class="text-zinc-400">[{label, value}]</code>
+                            .
+                        </p>
+                    </div>
                 </div>
             </div>
 

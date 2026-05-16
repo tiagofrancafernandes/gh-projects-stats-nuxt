@@ -9,6 +9,7 @@ const props = defineProps<{
     loading?: boolean;
     isExpanded?: boolean;
     stats: any;
+    customResults?: Record<string, any>;
 }>();
 
 const emit = defineEmits(['expand', 'update', 'updateChild']);
@@ -24,6 +25,13 @@ function save() {
 function cancel() {
     editTitle.value = props.title;
     isEditing.value = false;
+}
+
+function resolveValue(item: any) {
+    if (item.customFn && props.customResults?.[item.id] !== undefined) {
+        return props.customResults[item.id];
+    }
+    return resolvePath(props.stats, item.path) ?? 0;
 }
 
 function resolvePath(obj: any, path: string | undefined) {
@@ -44,7 +52,9 @@ const localChildren = computed({
     >
         <div class="flex items-center justify-between mb-6 relative z-10">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-zinc-800/50 border border-zinc-700/50 flex items-center justify-center">
+                <div
+                    class="w-8 h-8 rounded-lg bg-zinc-800/50 border border-zinc-700/50 flex items-center justify-center"
+                >
                     <iconify-icon icon="mdi:layers-outline" class="text-zinc-400"></iconify-icon>
                 </div>
                 <h3 v-if="!isEditing" class="text-zinc-100 font-bold text-sm uppercase tracking-widest">{{ title }}</h3>
@@ -54,7 +64,7 @@ const localChildren = computed({
                     class="bg-zinc-950 border border-zinc-800 rounded-lg px-2 py-1 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500"
                 />
             </div>
-            
+
             <div class="flex items-center gap-1">
                 <template v-if="isEditing">
                     <button @click="save" class="btn btn-white btn-sm px-3">Save</button>
@@ -91,31 +101,40 @@ const localChildren = computed({
             handle=".drag-handle"
         >
             <template #item="{ element: item }">
-                <div v-if="item.visible" :class="[item.cols === 1 ? 'col-span-1' : 'col-span-2']">
+                <div
+                    v-if="item.visible"
+                    class="relative group"
+                    :class="[item.cols === 1 ? 'col-span-1' : 'col-span-2']"
+                >
                     <StatCard
                         v-if="item.type === 'stat'"
                         :title="item.title"
                         :path="item.path"
-                        :value="resolvePath(stats, item.path) ?? 0"
+                        :value="resolveValue(item)"
                         :loading="loading"
                         :show-value="item.showValue"
                         :show-label="item.showLabel"
                         :format="item.format"
                         :precision="item.precision"
                         :sub-label="item.subLabel"
+                        :custom-fn="item.customFn"
                         @update="$emit('updateChild', item.id, $event)"
                     />
                     <GaugeChart
                         v-else-if="item.type === 'gauge'"
                         :title="item.title"
                         :path="item.path"
-                        :value="resolvePath(stats, item.path) ?? 0"
+                        :value="resolveValue(item)"
                         :max="50"
                         :loading="loading"
                         :sub-label="item.subLabel"
+                        :custom-fn="item.customFn"
                         @update="$emit('updateChild', item.id, $event)"
                     />
-                    <div v-else class="p-4 bg-zinc-900 rounded-xl text-[10px] text-zinc-600 uppercase font-bold text-center border border-zinc-800">
+                    <div
+                        v-else
+                        class="p-4 bg-zinc-900 rounded-xl text-[10px] text-zinc-600 uppercase font-bold text-center border border-zinc-800"
+                    >
                         {{ item.type }} not supported in groups yet
                     </div>
 
