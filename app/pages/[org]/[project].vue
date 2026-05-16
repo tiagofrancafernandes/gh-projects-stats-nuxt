@@ -92,10 +92,10 @@ function handleReorder(newLayout: any[]) {
 
 <template>
     <div class="min-h-screen bg-[#050505] text-zinc-300 font-sans selection:bg-blue-500/30">
-        <!-- Navigation -->
+        <!-- Top Navigation -->
         <nav
-            v-if="!focusMode"
-            class="sticky top-0 z-40 bg-[#050505]/80 backdrop-blur-xl border-b border-zinc-800/50 px-6 py-4"
+            v-show="!focusMode"
+            class="fixed top-0 left-0 right-0 z-40 bg-[#050505]/80 backdrop-blur-xl border-b border-zinc-800/50 px-8 py-4 animate-in slide-in-from-top duration-500"
         >
             <div class="max-w-7xl mx-auto flex items-center justify-between">
                 <div class="flex items-center gap-8">
@@ -120,8 +120,8 @@ function handleReorder(newLayout: any[]) {
                     </NuxtLink>
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <button @click="refresh" data-tooltip="Refresh" class="btn btn-outline">
+                <div class="flex items-center gap-3">
+                    <button @click="refresh" data-tooltip="Refresh" class="btn btn-ghost">
                         <iconify-icon
                             icon="mdi:refresh"
                             :class="{ 'animate-spin': pendingCards || pendingStats }"
@@ -129,19 +129,19 @@ function handleReorder(newLayout: any[]) {
                         ></iconify-icon>
                     </button>
 
-                    <div class="h-6 w-px bg-zinc-800 mx-2"></div>
+                    <div class="h-4 w-px bg-zinc-800 mx-1"></div>
 
-                    <button @click="focusMode = true" data-tooltip="TV Mode" class="btn btn-outline">
+                    <button @click="focusMode = true" data-tooltip="TV Mode" class="btn btn-ghost">
                         <iconify-icon icon="mdi:monitor-dashboard" class="text-lg"></iconify-icon>
                     </button>
 
-                    <button @click="isLayoutOpen = true" data-tooltip="Customize Layout" class="btn btn-outline">
+                    <button @click="isLayoutOpen = true" data-tooltip="Customize Layout" class="btn btn-ghost">
                         <iconify-icon icon="mdi:view-dashboard-edit" class="text-lg"></iconify-icon>
                     </button>
 
-                    <button @click="isFiltersOpen = true" data-tooltip="Filters" class="btn btn-white">
-                        <iconify-icon icon="mdi:filter-variant" class="text-lg"></iconify-icon>
-                        Filters
+                    <button @click="isFiltersOpen = true" data-tooltip="Filters" class="btn btn-white btn-sm">
+                        <iconify-icon icon="mdi:filter-variant" class="text-base"></iconify-icon>
+                        <span class="text-xs">Filters</span>
                     </button>
                 </div>
             </div>
@@ -162,7 +162,8 @@ function handleReorder(newLayout: any[]) {
             </button>
         </div>
 
-        <main class="max-w-7xl mx-auto px-6 py-12 space-y-12">
+        <!-- Main Dashboard Content -->
+        <main class="max-w-7xl mx-auto px-8 transition-all duration-500" :class="[focusMode ? 'pt-8' : 'pt-28 pb-20']">
             <!-- Layout Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <template v-for="item in layout" :key="item.id">
