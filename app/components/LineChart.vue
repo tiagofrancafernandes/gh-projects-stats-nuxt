@@ -90,12 +90,13 @@ const chartOptions = computed(() => ({
 
 <template>
     <div
-        class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-2xl p-6 h-full flex flex-col group relative overflow-hidden"
+        class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-2xl p-6 h-full flex flex-col group relative"
     >
         <div class="flex items-center justify-between mb-8 relative z-10">
             <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest">{{ title }}</h3>
             <button
                 @click.stop="$emit('expand')"
+                :data-tooltip="isExpanded ? 'Minimize' : 'Expand'"
                 class="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-all"
             >
                 <iconify-icon

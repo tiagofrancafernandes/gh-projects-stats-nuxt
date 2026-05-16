@@ -77,7 +77,7 @@ function handleDragOver(e: DragEvent, id: string) {
     const toIndex = layout.value.findIndex((i) => i.id === id);
 
     const item = layout.value.splice(fromIndex, 1)[0];
-    layout.value.splice(toIndex, 0, item);
+    layout.value.splice(toIndex, 0, item as any);
 }
 
 function handleDragEnd() {
@@ -287,7 +287,7 @@ function handleDragEnd() {
                         </template>
                         <template v-else-if="item.id === 'activity'">
                             <div
-                                class="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-2xl overflow-hidden flex flex-col h-full group relative"
+                                class="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-2xl flex flex-col h-full group relative"
                             >
                                 <!-- Drag Handle -->
                                 <div
@@ -475,7 +475,9 @@ body {
 
 .line-clamp-1 {
     display: -webkit-box;
+    line-clamp: 1;
     -webkit-line-clamp: 1;
+    box-orient: vertical;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
