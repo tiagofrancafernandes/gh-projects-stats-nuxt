@@ -16,7 +16,12 @@ defineEmits(['expand']);
         :class="{ 'h-full flex flex-col justify-center items-center': isExpanded }"
     >
         <!-- Decoration -->
-        <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/5 blur-3xl rounded-full"></div>
+        <div
+            class="absolute -right-8 -top-8 w-32 h-32 bg-blue-500/10 blur-[80px] rounded-full group-hover:bg-blue-500/20 transition-all duration-500"
+        ></div>
+        <div
+            class="absolute -left-8 -bottom-8 w-32 h-32 bg-purple-500/5 blur-[80px] rounded-full group-hover:bg-purple-500/10 transition-all duration-500"
+        ></div>
 
         <div class="flex items-center justify-between mb-4 w-full relative z-10">
             <span class="text-zinc-500 text-xs font-bold uppercase tracking-widest">{{ title }}</span>
