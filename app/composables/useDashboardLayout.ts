@@ -3,6 +3,8 @@ export interface LayoutItem {
     title: string;
     visible: boolean;
     cols: number; // 1 to 4
+    path?: string; // JSON path in stats object
+    type?: 'stat' | 'chart' | 'gauge' | 'list' | 'pie';
 }
 
 export interface DashboardView {
@@ -14,14 +16,22 @@ export interface DashboardView {
 
 export function useDashboardLayout() {
     const defaultLayout: LayoutItem[] = [
-        { id: 'total', title: 'Total Items', visible: true, cols: 1 },
-        { id: 'open', title: 'Open Items', visible: true, cols: 1 },
-        { id: 'closed', title: 'Closed Items', visible: true, cols: 1 },
-        { id: 'merged', title: 'Merged PRs', visible: true, cols: 1 },
-        { id: 'velocity', title: 'Velocity Chart', visible: true, cols: 2 },
-        { id: 'status', title: 'Status Chart', visible: true, cols: 2 },
-        { id: 'labels', title: 'Labels Chart', visible: true, cols: 4 },
-        { id: 'activity', title: 'Recent Activity', visible: true, cols: 4 },
+        { id: 'total', title: 'Total Items', visible: true, cols: 1, path: 'total', type: 'stat' },
+        { id: 'open', title: 'Open Items', visible: true, cols: 1, path: 'open', type: 'stat' },
+        { id: 'closed', title: 'Closed Items', visible: true, cols: 1, path: 'closed', type: 'stat' },
+        { id: 'merged', title: 'Merged PRs', visible: true, cols: 1, path: 'merged', type: 'stat' },
+        {
+            id: 'velocity_gauge',
+            title: 'Current Velocity',
+            visible: true,
+            cols: 1,
+            path: 'weeklyVelocity',
+            type: 'gauge',
+        },
+        { id: 'velocity', title: 'Velocity Chart', visible: true, cols: 3, path: 'velocity', type: 'chart' },
+        { id: 'status', title: 'Status Chart', visible: true, cols: 2, path: 'byStatus', type: 'pie' },
+        { id: 'labels', title: 'Labels Chart', visible: true, cols: 2, path: 'byLabel', type: 'pie' },
+        { id: 'activity', title: 'Recent Activity', visible: true, cols: 4, type: 'list' },
     ];
 
     const layout = ref<LayoutItem[]>([]);
@@ -128,6 +138,11 @@ export function useDashboardLayout() {
         }
     }
 
+    function updateItem(id: string, updates: Partial<LayoutItem>) {
+        const item = layout.value.find((i) => i.id === id);
+        if (item) Object.assign(item, updates);
+    }
+
     return {
         layout,
         views,
@@ -135,6 +150,7 @@ export function useDashboardLayout() {
         refreshInterval,
         toggleVisibility,
         setCols,
+        updateItem,
         saveView,
         loadView,
         deleteView,

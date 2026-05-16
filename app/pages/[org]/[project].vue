@@ -15,12 +15,18 @@ const {
     refreshInterval,
     toggleVisibility,
     setCols,
+    updateItem,
     saveView,
     loadView,
     deleteView,
     exportConfig,
     importConfig,
 } = useDashboardLayout();
+
+function resolvePath(obj: any, path: string | undefined) {
+    if (!path || !obj) return null;
+    return path.split('.').reduce((prev, curr) => prev?.[curr], obj);
+}
 
 const isFiltersOpen = ref(false);
 const isLayoutOpen = ref(false);
@@ -174,186 +180,163 @@ function handleReorder(newLayout: any[]) {
                             (item as any).isExpanded ? 'fixed inset-4 z-50 overflow-auto bg-[#050505] p-8' : 'relative',
                         ]"
                     >
-                        <template v-if="item.id === 'total'">
-                            <StatCard
-                                title="Total Items"
-                                :value="stats?.total || 0"
-                                :loading="pendingStats"
-                                color="blue"
-                                :is-expanded="(item as any).isExpanded"
-                                @expand="toggleExpand('total')"
-                            />
-                        </template>
-                        <template v-else-if="item.id === 'open'">
-                            <StatCard
-                                title="Open Items"
-                                :value="stats?.open || 0"
-                                :loading="pendingStats"
-                                color="green"
-                                :is-expanded="(item as any).isExpanded"
-                                @expand="toggleExpand('open')"
-                            />
-                        </template>
-                        <template v-else-if="item.id === 'closed'">
-                            <StatCard
-                                title="Closed Items"
-                                :value="stats?.closed || 0"
-                                :loading="pendingStats"
-                                color="purple"
-                                :is-expanded="(item as any).isExpanded"
-                                @expand="toggleExpand('closed')"
-                            />
-                        </template>
-                        <template v-else-if="item.id === 'merged'">
-                            <StatCard
-                                title="Merged PRs"
-                                :value="stats?.merged || 0"
-                                :loading="pendingStats"
-                                color="pink"
-                                :is-expanded="(item as any).isExpanded"
-                                @expand="toggleExpand('merged')"
-                            />
-                        </template>
-                        <template v-else-if="item.id === 'velocity'">
-                            <LineChart
-                                title="Velocity"
-                                :data="stats?.velocity || []"
-                                :loading="pendingStats"
-                                @expand="toggleExpand('velocity')"
-                                :is-expanded="(item as any).isExpanded"
-                            />
-                        </template>
-                        <template v-else-if="item.id === 'status'">
-                            <PieChart
-                                title="By Status"
-                                :data="stats?.byStatus || {}"
-                                :loading="pendingStats"
-                                @expand="toggleExpand('status')"
-                                :is-expanded="(item as any).isExpanded"
-                            />
-                        </template>
-                        <template v-else-if="item.id === 'labels'">
-                            <PieChart
-                                title="By Labels"
-                                :data="stats?.byLabel || {}"
-                                :loading="pendingStats"
-                                @expand="toggleExpand('labels')"
-                                :is-expanded="(item as any).isExpanded"
-                            />
-                        </template>
-                        <template v-else-if="item.id === 'activity'">
-                            <div
-                                class="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-2xl flex flex-col h-full group relative"
-                            >
-                                <div
-                                    class="p-6 border-b border-zinc-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4"
-                                >
-                                    <div class="flex items-center gap-4">
-                                        <h3 class="text-sm font-bold text-zinc-100 uppercase tracking-widest">
-                                            Recent Activity
-                                        </h3>
-                                        <span
-                                            class="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-500 text-[10px] font-bold"
-                                        >
-                                            {{ filteredCards.length }} Items
-                                        </span>
-                                    </div>
-                                    <div class="relative max-w-xs w-full">
-                                        <iconify-icon
-                                            icon="mdi:magnify"
-                                            class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
-                                        ></iconify-icon>
-                                        <input
-                                            v-model="itemSearch"
-                                            type="text"
-                                            placeholder="Filter by title..."
-                                            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg pl-10 pr-4 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-all"
-                                        />
-                                    </div>
-                                </div>
+                        <StatCard
+                            v-if="item.type === 'stat'"
+                            :title="item.title"
+                            :path="item.path"
+                            :value="resolvePath(stats, item.path) ?? 0"
+                            :loading="pendingStats"
+                            :is-expanded="(item as any).isExpanded"
+                            @expand="toggleExpand(item.id)"
+                            @update="updateItem(item.id, $event)"
+                        />
 
-                                <div class="overflow-x-auto flex-1">
-                                    <table class="w-full text-left">
-                                        <thead
-                                            class="bg-zinc-900/30 text-zinc-500 text-[10px] font-semibold uppercase tracking-wider"
-                                        >
-                                            <tr>
-                                                <th class="px-6 py-3">Content</th>
-                                                <th class="px-6 py-3">Labels</th>
-                                                <th class="px-6 py-3">Status</th>
-                                                <th class="px-6 py-3">State</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-zinc-800/30">
-                                            <tr
-                                                v-for="card in filteredCards"
-                                                :key="card.id"
-                                                class="border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors group/row"
-                                            >
-                                                <td class="px-6 py-5">
-                                                    <div class="flex items-center gap-4">
-                                                        <div
-                                                            class="w-8 h-8 rounded-lg flex items-center justify-center bg-zinc-800/50 border border-zinc-700/50 group-hover/row:border-blue-500/50 transition-all"
-                                                        >
-                                                            <iconify-icon
-                                                                :icon="
-                                                                    card.type === 'pr'
-                                                                        ? 'mdi:git-pull-request'
-                                                                        : 'mdi:alert-circle-outline'
-                                                                "
-                                                                :class="
-                                                                    card.state === 'OPEN'
-                                                                        ? 'text-green-500'
-                                                                        : 'text-purple-500'
-                                                                "
-                                                            ></iconify-icon>
-                                                        </div>
-                                                        <a
-                                                            :href="`https://github.com/${ownerRef}/${projectNumber}/issues/${card.id}`"
-                                                            target="_blank"
-                                                            class="text-sm font-medium text-zinc-300 hover:text-white transition-colors line-clamp-1"
-                                                        >
-                                                            {{ card.title }}
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                                <td class="px-6 py-5">
-                                                    <div class="flex flex-wrap gap-1.5">
-                                                        <span
-                                                            v-for="label in card.labels"
-                                                            :key="label"
-                                                            class="px-2 py-0.5 rounded-md bg-zinc-800/50 border border-zinc-700/50 text-zinc-500 text-[10px] font-bold"
-                                                        >
-                                                            {{ label }}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td class="px-6 py-5">
-                                                    <span
-                                                        class="px-2 py-1 rounded-lg bg-zinc-800 text-zinc-400 text-[10px] font-bold border border-zinc-700/50"
-                                                    >
-                                                        {{ card.status }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-6 py-5">
-                                                    <div class="flex items-center gap-2">
-                                                        <div
-                                                            class="w-1.5 h-1.5 rounded-full"
-                                                            :class="
-                                                                card.state === 'OPEN' ? 'bg-green-500' : 'bg-purple-500'
-                                                            "
-                                                        ></div>
-                                                        <span class="text-[10px] font-bold text-zinc-500 uppercase">
-                                                            {{ card.state }}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        <GaugeChart
+                            v-else-if="item.type === 'gauge'"
+                            :title="item.title"
+                            :path="item.path"
+                            :value="resolvePath(stats, item.path) ?? 0"
+                            :max="50"
+                            :loading="pendingStats"
+                            :is-expanded="(item as any).isExpanded"
+                            @expand="toggleExpand(item.id)"
+                            @update="updateItem(item.id, $event)"
+                        />
+
+                        <LineChart
+                            v-else-if="item.type === 'chart'"
+                            :title="item.title"
+                            :path="item.path"
+                            :data="resolvePath(stats, item.path) ?? []"
+                            :loading="pendingStats"
+                            :is-expanded="(item as any).isExpanded"
+                            @expand="toggleExpand(item.id)"
+                            @update="updateItem(item.id, $event)"
+                        />
+
+                        <PieChart
+                            v-else-if="item.type === 'pie'"
+                            :title="item.title"
+                            :path="item.path"
+                            :data="resolvePath(stats, item.path) ?? {}"
+                            :loading="pendingStats"
+                            :is-expanded="(item as any).isExpanded"
+                            @expand="toggleExpand(item.id)"
+                            @update="updateItem(item.id, $event)"
+                        />
+
+                        <div
+                            v-else-if="item.type === 'list'"
+                            class="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl flex flex-col h-full group relative"
+                        >
+                            <div
+                                class="p-6 border-b border-zinc-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                            >
+                                <div class="flex items-center gap-4">
+                                    <h3 class="text-sm font-bold text-zinc-100 uppercase tracking-widest">
+                                        Recent Activity
+                                    </h3>
+                                    <span
+                                        class="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-500 text-[10px] font-bold"
+                                    >
+                                        {{ filteredCards.length }} Items
+                                    </span>
+                                </div>
+                                <div class="relative max-w-xs w-full">
+                                    <iconify-icon
+                                        icon="mdi:magnify"
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
+                                    ></iconify-icon>
+                                    <input
+                                        v-model="itemSearch"
+                                        type="text"
+                                        placeholder="Filter by title..."
+                                        class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg pl-10 pr-4 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-all"
+                                    />
                                 </div>
                             </div>
-                        </template>
+
+                            <div class="overflow-x-auto flex-1">
+                                <table class="w-full text-left">
+                                    <thead
+                                        class="bg-zinc-900/30 text-zinc-500 text-[10px] font-semibold uppercase tracking-wider"
+                                    >
+                                        <tr>
+                                            <th class="px-6 py-3">Content</th>
+                                            <th class="px-6 py-3">Labels</th>
+                                            <th class="px-6 py-3">Status</th>
+                                            <th class="px-6 py-3">State</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-zinc-800/30">
+                                        <tr
+                                            v-for="card in filteredCards"
+                                            :key="card.id"
+                                            class="border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors group/row"
+                                        >
+                                            <td class="px-6 py-5">
+                                                <div class="flex items-center gap-4">
+                                                    <div
+                                                        class="w-8 h-8 rounded-lg flex items-center justify-center bg-zinc-800/50 border border-zinc-700/50 group-hover/row:border-blue-500/50 transition-all"
+                                                    >
+                                                        <iconify-icon
+                                                            :icon="
+                                                                card.type === 'pr'
+                                                                    ? 'mdi:git-pull-request'
+                                                                    : 'mdi:alert-circle-outline'
+                                                            "
+                                                            :class="
+                                                                card.state === 'OPEN'
+                                                                    ? 'text-green-500'
+                                                                    : 'text-purple-500'
+                                                            "
+                                                        ></iconify-icon>
+                                                    </div>
+                                                    <a
+                                                        :href="`https://github.com/${ownerRef}/${projectNumber}/issues/${card.id}`"
+                                                        target="_blank"
+                                                        class="text-sm font-medium text-zinc-300 hover:text-white transition-colors line-clamp-1"
+                                                    >
+                                                        {{ card.title }}
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-5">
+                                                <div class="flex flex-wrap gap-1.5">
+                                                    <span
+                                                        v-for="label in card.labels"
+                                                        :key="label"
+                                                        class="px-2 py-0.5 rounded-md bg-zinc-800/50 border border-zinc-700/50 text-zinc-500 text-[10px] font-bold"
+                                                    >
+                                                        {{ label }}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-5">
+                                                <span
+                                                    class="px-2 py-1 rounded-lg bg-zinc-800 text-zinc-400 text-[10px] font-bold border border-zinc-700/50"
+                                                >
+                                                    {{ card.status }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-5">
+                                                <div class="flex items-center gap-2">
+                                                    <div
+                                                        class="w-1.5 h-1.5 rounded-full"
+                                                        :class="
+                                                            card.state === 'OPEN' ? 'bg-green-500' : 'bg-purple-500'
+                                                        "
+                                                    ></div>
+                                                    <span class="text-[10px] font-bold text-zinc-500 uppercase">
+                                                        {{ card.state }}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </template>
             </div>

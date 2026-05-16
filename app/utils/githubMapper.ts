@@ -62,5 +62,14 @@ export function aggregateStats(cards: GithubCard[]): GithubStats {
         .map(([date, closed]) => ({ date, closed }))
         .sort((a, b) => a.date.localeCompare(b.date));
 
+    // Calculate weekly velocity
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+
+    stats.weeklyVelocity = stats.velocity
+        .filter((v) => v.date >= sevenDaysAgoStr)
+        .reduce((acc, v) => acc + v.closed, 0);
+
     return stats;
 }

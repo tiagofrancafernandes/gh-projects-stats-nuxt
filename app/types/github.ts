@@ -22,6 +22,7 @@ export interface GithubStats {
     byStatus: Record<string, number>;
     byLabel: Record<string, number>;
     velocity: { date: string; closed: number }[];
+    weeklyVelocity?: number;
     projectTitle?: string;
 }
 

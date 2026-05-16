@@ -1,25 +1,15 @@
 <script setup lang="ts">
-import { Line } from 'vue-chartjs';
-import {
-    Chart as ChartJS,
-    Title,
-    Tooltip,
-    Legend,
-    LineElement,
-    PointElement,
-    LinearScale,
-    CategoryScale,
-    Filler,
-} from 'chart.js';
+import { Doughnut } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale } from 'chart.js';
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale, Filler);
+ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale);
 
 const props = defineProps<{
-    data: any[];
+    value: number;
+    max: number;
     title: string;
     loading?: boolean;
     isExpanded?: boolean;
-    showHandle?: boolean;
     path?: string;
 }>();
 
@@ -41,29 +31,19 @@ function cancel() {
 }
 
 const chartData = computed(() => ({
-    labels: props.data?.map((d: any) => d.date) || [],
+    labels: ['Velocity', 'Remaining'],
     datasets: [
         {
-            label: 'Items',
-            data: props.data?.map((d: any) => d.closed) || [],
-            borderColor: '#3b82f6',
-            backgroundColor: (context: any) => {
-                const chart = context.chart;
-                const { ctx, chartArea } = chart;
-                if (!chartArea) return null;
-                const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                gradient.addColorStop(0, 'rgba(59, 130, 246, 0)');
-                gradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
-                return gradient;
-            },
-            fill: true,
-            tension: 0.4,
-            pointRadius: props.isExpanded ? 6 : 4,
-            pointHoverRadius: props.isExpanded ? 8 : 6,
-            pointBackgroundColor: '#3b82f6',
-            pointBorderColor: '#09090b',
-            pointBorderWidth: 2,
-            borderWidth: 3,
+            data: [props.value, Math.max(0, props.max - props.value)],
+            backgroundColor: [
+                '#3b82f6', // Primary color
+                '#18181b', // Background color for the gauge track
+            ],
+            borderWidth: 0,
+            circumference: 180,
+            rotation: 270,
+            borderRadius: 5,
+            cutout: '85%',
         },
     ],
 }));
@@ -73,43 +53,28 @@ const chartOptions = computed(() => ({
     maintainAspectRatio: false,
     plugins: {
         legend: { display: false },
-        tooltip: {
-            backgroundColor: '#09090b',
-            titleColor: '#fafafa',
-            bodyColor: '#a1a1aa',
-            borderColor: '#27272a',
-            borderWidth: 1,
-            padding: 16,
-            cornerRadius: 12,
-        },
+        tooltip: { enabled: false },
     },
-    scales: {
-        x: {
-            grid: { display: false },
-            ticks: {
-                color: '#52525b',
-                font: { size: props.isExpanded ? 12 : 10, weight: 'bold' },
-            },
-        },
-        y: {
-            grid: { color: '#18181b' },
-            ticks: {
-                color: '#52525b',
-                font: { size: props.isExpanded ? 12 : 10 },
-                stepSize: 1,
-            },
-            beginAtZero: true,
-        },
+    animation: {
+        duration: 2000,
+        easing: 'easeOutQuart' as const,
     },
 }));
 </script>
 
 <template>
     <div
-        class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-xl p-6 h-full flex flex-col group relative"
+        class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-xl p-6 h-full flex flex-col group relative overflow-hidden"
     >
-        <div v-if="!isEditing" class="flex flex-col h-full w-full">
-            <div class="flex items-center justify-between mb-8 relative z-10">
+        <!-- Decoration -->
+        <div class="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
+            <div
+                class="absolute -right-8 -top-8 w-32 h-32 bg-blue-500/10 blur-[80px] rounded-full group-hover:bg-blue-500/20 transition-all duration-500"
+            ></div>
+        </div>
+
+        <div v-if="!isEditing" class="flex flex-col h-full w-full relative z-10">
+            <div class="flex items-center justify-between mb-2">
                 <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest">{{ title }}</h3>
                 <div class="flex items-center gap-1">
                     <button
@@ -132,18 +97,35 @@ const chartOptions = computed(() => ({
                 </div>
             </div>
 
-            <div class="flex-1 relative" :class="isExpanded ? 'min-h-[500px]' : 'min-h-[300px]'">
+            <div class="flex-1 relative flex flex-col items-center justify-center pt-8">
                 <div v-if="loading" class="absolute inset-0 flex items-center justify-center">
                     <div class="w-10 h-10 border-2 border-zinc-800 border-t-blue-500 rounded-full animate-spin"></div>
                 </div>
-                <Line v-else :data="chartData" :options="chartOptions" />
+
+                <div class="relative w-full h-full max-h-[160px]">
+                    <Doughnut v-if="!loading" :data="chartData" :options="chartOptions" />
+
+                    <!-- Center Text -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center mt-8">
+                        <span class="font-bold text-zinc-100 tracking-tighter text-4xl">
+                            {{ value }}
+                        </span>
+                        <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">Items / Week</span>
+                    </div>
+                </div>
+
+                <!-- Gauge Labels -->
+                <div class="w-full flex justify-between px-8 -mt-2">
+                    <span class="text-[10px] font-bold text-zinc-600">0</span>
+                    <span class="text-[10px] font-bold text-zinc-600">{{ max }}</span>
+                </div>
             </div>
         </div>
 
         <!-- Edit Mode -->
         <div v-else class="flex flex-col h-full w-full relative z-10 gap-4">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-4 mb-2">
-                <span class="text-zinc-100 text-xs font-bold uppercase tracking-widest">Configure Chart</span>
+                <span class="text-zinc-100 text-xs font-bold uppercase tracking-widest">Configure Gauge</span>
                 <button @click="cancel" class="btn btn-ghost btn-sm px-2">
                     <iconify-icon icon="mdi:close" class="text-base"></iconify-icon>
                 </button>
