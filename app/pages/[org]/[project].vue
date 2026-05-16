@@ -189,15 +189,20 @@ function handleDragEnd() {
             </div>
         </nav>
 
-        <!-- Focus Mode Close Button -->
-        <button
+        <!-- Focus Mode Close Button (Top Center Hover Zone) -->
+        <div
             v-if="focusMode"
-            @click="focusMode = false"
-            data-tooltip="Exit TV Mode"
-            class="fixed bottom-8 right-8 z-50 p-4 rounded-full bg-zinc-900/80 backdrop-blur border border-zinc-800 text-zinc-500 hover:text-white transition-all opacity-20 hover:opacity-100"
+            class="fixed top-0 left-0 right-0 h-24 z-[100] group flex justify-center items-start pt-4 pointer-events-none"
         >
-            <iconify-icon icon="mdi:close" class="text-2xl"></iconify-icon>
-        </button>
+            <button
+                @click="focusMode = false"
+                data-tooltip="Exit TV Mode"
+                class="pointer-events-auto p-3 px-6 rounded-full bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 text-zinc-400 hover:text-white transition-all opacity-0 group-hover:opacity-100 translate-y-[-20px] group-hover:translate-y-0 shadow-2xl flex items-center gap-2"
+            >
+                <iconify-icon icon="mdi:close" class="text-xl"></iconify-icon>
+                <span class="text-xs font-bold uppercase tracking-widest">Exit TV Mode</span>
+            </button>
+        </div>
 
         <main class="max-w-7xl mx-auto px-6 py-12 space-y-12">
             <!-- Layout Grid with Drag and Drop -->
