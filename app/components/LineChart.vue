@@ -40,33 +40,36 @@ function cancel() {
     isEditing.value = false;
 }
 
-const chartData = computed(() => ({
-    labels: props.data?.map((d: any) => d.date) || [],
-    datasets: [
-        {
-            label: 'Items',
-            data: props.data?.map((d: any) => d.closed) || [],
-            borderColor: '#3b82f6',
-            backgroundColor: (context: any) => {
-                const chart = context.chart;
-                const { ctx, chartArea } = chart;
-                if (!chartArea) return null;
-                const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                gradient.addColorStop(0, 'rgba(59, 130, 246, 0)');
-                gradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
-                return gradient;
+const chartData = computed(() => {
+    const dataArray = Array.isArray(props.data) ? props.data : [];
+    return {
+        labels: dataArray.map((d: any) => d.date) || [],
+        datasets: [
+            {
+                label: 'Items',
+                data: dataArray.map((d: any) => d.closed) || [],
+                borderColor: '#3b82f6',
+                backgroundColor: (context: any) => {
+                    const chart = context.chart;
+                    const { ctx, chartArea } = chart;
+                    if (!chartArea) return null;
+                    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                    gradient.addColorStop(0, 'rgba(59, 130, 246, 0)');
+                    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
+                    return gradient;
+                },
+                fill: true,
+                tension: 0.4,
+                pointRadius: props.isExpanded ? 6 : 4,
+                pointHoverRadius: props.isExpanded ? 8 : 6,
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#09090b',
+                pointBorderWidth: 2,
+                borderWidth: 3,
             },
-            fill: true,
-            tension: 0.4,
-            pointRadius: props.isExpanded ? 6 : 4,
-            pointHoverRadius: props.isExpanded ? 8 : 6,
-            pointBackgroundColor: '#3b82f6',
-            pointBorderColor: '#09090b',
-            pointBorderWidth: 2,
-            borderWidth: 3,
-        },
-    ],
-}));
+        ],
+    };
+});
 
 const chartOptions = computed(() => ({
     responsive: true,

@@ -30,28 +30,31 @@ function cancel() {
     isEditing.value = false;
 }
 
-const chartData = computed(() => ({
-    labels: props.data ? Object.keys(props.data) : [],
-    datasets: [
-        {
-            backgroundColor: [
-                '#3b82f6',
-                '#8b5cf6',
-                '#ec4899',
-                '#f97316',
-                '#eab308',
-                '#22c55e',
-                '#06b6d4',
-                '#6366f1',
-                '#a855f7',
-                '#f43f5e',
-            ],
-            data: props.data ? Object.values(props.data) : [],
-            borderWidth: 0,
-            hoverOffset: 15,
-        },
-    ],
-}));
+const chartData = computed(() => {
+    const dataObj = props.data && typeof props.data === 'object' && !Array.isArray(props.data) ? props.data : {};
+    return {
+        labels: Object.keys(dataObj),
+        datasets: [
+            {
+                backgroundColor: [
+                    '#3b82f6',
+                    '#8b5cf6',
+                    '#ec4899',
+                    '#f97316',
+                    '#eab308',
+                    '#22c55e',
+                    '#06b6d4',
+                    '#6366f1',
+                    '#a855f7',
+                    '#f43f5e',
+                ],
+                data: props.data ? Object.values(props.data) : [],
+                borderWidth: 0,
+                hoverOffset: 15,
+            },
+        ],
+    };
+});
 
 const chartOptions = computed(() => ({
     responsive: true,
