@@ -4,7 +4,9 @@ export interface LayoutItem {
     visible: boolean;
     cols: number; // 1 to 4
     path?: string; // JSON path in stats object
-    type?: 'stat' | 'chart' | 'gauge' | 'list' | 'pie';
+    type?: 'stat' | 'chart' | 'gauge' | 'list' | 'pie' | 'group';
+    subLabel?: string; // New: editable sub-label
+    children?: LayoutItem[]; // New: for nested groups
     showValue?: boolean;
     showLabel?: boolean;
     format?: 'fixed' | 'percent';
@@ -79,8 +81,9 @@ export function useDashboardLayout() {
             showLabel: true,
             format: 'fixed',
             precision: 0,
+            subLabel: 'Items / Week',
         },
-        { id: 'velocity', title: 'Velocity Chart', visible: true, cols: 3, path: 'velocity', type: 'chart' },
+        { id: 'velocity', title: 'Velocity Chart', visible: true, cols: 3, path: 'velocity', type: 'gauge' },
         { id: 'status', title: 'Status Chart', visible: true, cols: 2, path: 'byStatus', type: 'pie' },
         { id: 'labels', title: 'Labels Chart', visible: true, cols: 2, path: 'byLabel', type: 'pie' },
         { id: 'activity', title: 'Recent Activity', visible: true, cols: 4, type: 'list' },
@@ -176,18 +179,24 @@ export function useDashboardLayout() {
 
     function addItem(type: LayoutItem['type'] = 'stat') {
         const id = `custom-${Date.now()}`;
-        layout.value.push({
+        const item: LayoutItem = {
             id,
-            title: 'New Card',
+            title: type === 'group' ? 'New Group' : 'New Card',
             visible: true,
-            cols: 1,
+            cols: type === 'group' ? 2 : 1,
             type,
             path: '',
             showValue: true,
             showLabel: true,
             format: 'fixed',
             precision: 0,
-        });
+        };
+
+        if (type === 'group') {
+            item.children = [];
+        }
+
+        layout.value.push(item);
     }
 
     function removeItem(id: string) {
@@ -227,8 +236,18 @@ export function useDashboardLayout() {
     }
 
     function updateItem(id: string, updates: Partial<LayoutItem>) {
-        const item = layout.value.find((i) => i.id === id);
-        if (item) Object.assign(item, updates);
+        const findAndUpdate = (items: LayoutItem[]): boolean => {
+            const item = items.find((i) => i.id === id);
+            if (item) {
+                Object.assign(item, updates);
+                return true;
+            }
+            for (const i of items) {
+                if (i.children && findAndUpdate(i.children)) return true;
+            }
+            return false;
+        };
+        findAndUpdate(layout.value);
     }
 
     return {

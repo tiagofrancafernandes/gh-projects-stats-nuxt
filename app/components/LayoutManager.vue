@@ -111,6 +111,20 @@ function moveItem(index: number, direction: 'up' | 'down') {
                                 + Stat
                             </button>
                             <button
+                                @click="emit('addItem', 'gauge')"
+                                class="btn btn-black btn-sm text-[10px] py-1"
+                                v-tippy="'Add Gauge'"
+                            >
+                                + Gauge
+                            </button>
+                            <button
+                                @click="emit('addItem', 'group')"
+                                class="btn btn-black btn-sm text-[10px] py-1"
+                                v-tippy="'Add Group Container'"
+                            >
+                                + Group
+                            </button>
+                            <button
                                 @click="emit('addItem', 'pie')"
                                 class="btn btn-black btn-sm text-[10px] py-1"
                                 v-tippy="'Add Chart'"
@@ -160,6 +174,7 @@ function moveItem(index: number, direction: 'up' | 'down') {
                                 <div class="text-sm font-bold text-zinc-100 truncate">{{ item.title }}</div>
                                 <div class="text-[10px] text-zinc-600 uppercase font-bold tracking-tighter">
                                     ID: {{ item.id }}
+                                    <span v-if="item.subLabel" class="ml-2 text-blue-500/50">• {{ item.subLabel }}</span>
                                 </div>
                             </div>
 

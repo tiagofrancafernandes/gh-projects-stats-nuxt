@@ -244,6 +244,7 @@ const currentViewName = computed(() => {
                             :show-label="item.showLabel"
                             :format="item.format"
                             :precision="item.precision"
+                            :sub-label="item.subLabel"
                             @expand="toggleExpand(item.id)"
                             @update="updateItem(item.id, $event)"
                         />
@@ -256,8 +257,22 @@ const currentViewName = computed(() => {
                             :max="50"
                             :loading="pendingStats"
                             :is-expanded="(item as any).isExpanded"
+                            :sub-label="item.subLabel"
                             @expand="toggleExpand(item.id)"
                             @update="updateItem(item.id, $event)"
+                        />
+
+                        <GroupCard
+                            v-else-if="item.type === 'group'"
+                            :id="item.id"
+                            :title="item.title"
+                            :children="item.children || []"
+                            :stats="stats"
+                            :loading="pendingStats"
+                            :is-expanded="(item as any).isExpanded"
+                            @expand="toggleExpand(item.id)"
+                            @update="updateItem(item.id, $event)"
+                            @update-child="updateItem"
                         />
 
                         <LineChart
@@ -402,16 +417,23 @@ const currentViewName = computed(() => {
                             </div>
                         </div>
 
-                        <!-- Add drag handle to StatCard and other components if they don't have it -->
+                        <!-- Drag Handle -->
                         <div
                             v-if="item.type !== 'list'"
-                            class="drag-handle absolute top-6 left-2 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-zinc-800 z-20"
+                            class="drag-handle absolute top-4 left-4 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-all duration-300 p-1.5 rounded-lg hover:bg-white/10 z-20 backdrop-blur-sm border border-transparent hover:border-white/20"
                         >
-                            <iconify-icon icon="mdi:drag-variant" class="text-zinc-600 text-xs"></iconify-icon>
+                            <iconify-icon icon="mdi:drag-variant" class="text-zinc-500 text-lg"></iconify-icon>
                         </div>
                     </div>
                 </template>
             </draggable>
+
+            <style scoped>
+            .dashboard-grid {
+                background-image: radial-gradient(circle at 1px 1px, #ffffff05 1px, transparent 0);
+                background-size: 40px 40px;
+            }
+            </style>
         </main>
 
         <!-- Modals -->

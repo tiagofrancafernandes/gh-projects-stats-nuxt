@@ -11,6 +11,7 @@ const props = defineProps<{
     showLabel?: boolean;
     format?: 'fixed' | 'percent';
     precision?: number;
+    subLabel?: string;
 }>();
 
 const emit = defineEmits(['expand', 'update']);
@@ -22,6 +23,7 @@ const editShowValue = ref(props.showValue !== false);
 const editShowLabel = ref(props.showLabel !== false);
 const editFormat = ref(props.format || 'fixed');
 const editPrecision = ref(props.precision ?? 0);
+const editSubLabel = ref(props.subLabel || '');
 
 const formattedValue = computed(() => {
     let val = Number(props.value);
@@ -41,6 +43,7 @@ function save() {
         showLabel: editShowLabel.value,
         format: editFormat.value,
         precision: editPrecision.value,
+        subLabel: editSubLabel.value,
     });
     isEditing.value = false;
 }
@@ -52,6 +55,7 @@ function cancel() {
     editShowLabel.value = props.showLabel !== false;
     editFormat.value = props.format || 'fixed';
     editPrecision.value = props.precision ?? 0;
+    editSubLabel.value = props.subLabel || '';
     isEditing.value = false;
 }
 </script>
@@ -106,9 +110,9 @@ function cancel() {
                 </div>
             </div>
 
-            <div v-if="!loading" class="mt-4 flex items-center gap-2 text-[10px] font-bold text-zinc-500">
-                <span class="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700">LIVE</span>
-                <span>Last updated just now</span>
+            <div v-if="!loading" class="mt-4 flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">
+                <span v-if="!subLabel" class="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700">LIVE</span>
+                <span>{{ subLabel || 'Last updated just now' }}</span>
             </div>
         </div>
 
@@ -181,6 +185,18 @@ function cancel() {
                             class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100"
                         />
                     </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Sub-label / Units</label>
+                    <input
+                        id="card-sublabel"
+                        name="card-sublabel"
+                        v-model="editSubLabel"
+                        type="text"
+                        placeholder="e.g. Items / Week"
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all"
+                    />
                 </div>
 
                 <div class="space-y-1.5">
