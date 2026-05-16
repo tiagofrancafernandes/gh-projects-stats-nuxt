@@ -8,9 +8,17 @@ const currentStep = ref<Step>('ORG_SELECT');
 const focusMode = ref(false);
 const expandedCardId = ref<string | null>(null);
 const isFiltersOpen = ref(false);
+const itemSearch = ref('');
 
 const selectedOrg = ref<GithubOrg | null>(null);
 const selectedProject = ref<GithubProject | null>(null);
+
+const filteredCards = computed(() => {
+    if (!cards.value) return [];
+    if (!itemSearch.value) return cards.value;
+    const s = itemSearch.value.toLowerCase();
+    return cards.value.filter((card) => card.title.toLowerCase().includes(s));
+});
 
 const { data: orgs, pending: pendingOrgs } = useFetch<GithubOrg[]>('/api/orgs');
 const {
@@ -360,11 +368,29 @@ const getStatusColor = (status: string) => {
                     <div
                         class="lg:col-span-2 bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-2xl overflow-hidden flex flex-col"
                     >
-                        <div class="p-6 border-b border-zinc-800/50 flex items-center justify-between bg-zinc-900/20">
-                            <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest">Recent Activity</h3>
-                            <span class="text-[10px] font-bold text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded">
-                                {{ dashboardCards?.length || 0 }} ITEMS
-                            </span>
+                        <div
+                            class="p-6 border-b border-zinc-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                        >
+                            <div class="flex items-center gap-4">
+                                <h3 class="text-sm font-bold text-zinc-100 uppercase tracking-widest">
+                                    Recent Activity
+                                </h3>
+                                <span class="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-500 text-[10px] font-bold">
+                                    {{ filteredCards.length }} Items
+                                </span>
+                            </div>
+                            <div class="relative max-w-xs w-full">
+                                <iconify-icon
+                                    icon="mdi:magnify"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
+                                ></iconify-icon>
+                                <input
+                                    v-model="itemSearch"
+                                    type="text"
+                                    placeholder="Filter by title..."
+                                    class="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-xl pl-10 pr-4 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
+                                />
+                            </div>
                         </div>
 
                         <div class="overflow-x-auto">
@@ -381,9 +407,9 @@ const getStatusColor = (status: string) => {
                                 </thead>
                                 <tbody class="divide-y divide-zinc-800/30">
                                     <tr
-                                        v-for="card in dashboardCards"
+                                        v-for="card in filteredCards"
                                         :key="card.id"
-                                        class="hover:bg-zinc-800/20 transition-all group"
+                                        class="border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors group/row"
                                     >
                                         <td class="px-6 py-5">
                                             <div class="flex items-center gap-4">
