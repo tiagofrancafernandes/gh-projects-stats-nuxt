@@ -169,13 +169,15 @@ const chartOptions = computed(() => ({
                             {{ useLogic ? 'Custom Logic (Async JS)' : 'Data Path' }}
                         </label>
                         <div class="flex items-center gap-2">
-                            <span class="text-[9px] font-bold text-zinc-600 uppercase">{{ useLogic ? 'Logic Enabled' : 'Use Path' }}</span>
-                            <button 
+                            <span class="text-[9px] font-bold text-zinc-600 uppercase">
+                                {{ useLogic ? 'Logic Enabled' : 'Use Path' }}
+                            </span>
+                            <button
                                 @click="useLogic = !useLogic"
                                 class="w-8 h-4 rounded-full relative transition-colors duration-300 border border-zinc-700"
                                 :class="useLogic ? 'bg-blue-600' : 'bg-zinc-800'"
                             >
-                                <div 
+                                <div
                                     class="absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-all duration-300"
                                     :class="useLogic ? 'left-4.5' : 'left-0.5'"
                                 ></div>
@@ -194,8 +196,12 @@ const chartOptions = computed(() => ({
                         />
                     </div>
                     <div v-else class="space-y-2">
-                        <div class="bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden focus-within:border-blue-500/50 transition-all">
-                            <div class="px-3 py-1.5 bg-zinc-900/50 border-b border-zinc-800 flex items-center justify-between">
+                        <div
+                            class="bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden focus-within:border-blue-500/50 transition-all"
+                        >
+                            <div
+                                class="px-3 py-1.5 bg-zinc-900/50 border-b border-zinc-800 flex items-center justify-between"
+                            >
                                 <span class="text-[9px] font-mono text-zinc-500">async (stats, cards) => {</span>
                                 <iconify-icon icon="mdi:javascript" class="text-zinc-600"></iconify-icon>
                             </div>
@@ -210,7 +216,11 @@ const chartOptions = computed(() => ({
                             </div>
                         </div>
                         <p class="text-[9px] text-zinc-600 leading-tight">
-                            Must return an object <code class="text-zinc-400">{ key: val }</code> or array <code class="text-zinc-400">[{label, value}]</code>.
+                            Must return an object
+                            <code class="text-zinc-400">{ key: val }</code>
+                            or array
+                            <code class="text-zinc-400">[{label, value}]</code>
+                            .
                         </p>
                     </div>
                 </div>

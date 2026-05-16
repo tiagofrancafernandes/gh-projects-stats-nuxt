@@ -263,11 +263,21 @@ export function useDashboardLayout() {
         findAndUpdate(layout.value);
     }
 
+    const hasUnsavedChanges = computed(() => {
+        const currentView = views.value[currentViewId.value];
+        if (!currentView) return false;
+        return (
+            JSON.stringify(layout.value) !== JSON.stringify(currentView.layout) ||
+            refreshInterval.value !== currentView.refreshInterval
+        );
+    });
+
     return {
         layout,
         views,
         currentViewId,
         refreshInterval,
+        hasUnsavedChanges,
         toggleVisibility,
         setCols,
         updateItem,
