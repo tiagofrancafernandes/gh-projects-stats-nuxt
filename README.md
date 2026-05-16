@@ -25,6 +25,22 @@ A professional, high-performance dashboard for visualizing GitHub Projects v2 me
 - **Charts**: [Chart.js](https://www.chartjs.org/) via [vue-chartjs](https://vue-chartjs.org/)
 - **State/Hooks**: [@vueuse/nuxt](https://vueuse.org/)
 
+## Screenshots
+
+![Dashboard Main](./docs/assets/dashboard-main.png)
+*Modern, glassmorphic dashboard with real-time metrics.*
+
+![Layout Manager](./docs/assets/layout-manager.png)
+*Advanced layout management with card grouping and drag-and-drop.*
+
+## Documentation
+
+Explore our detailed guides in the [docs](./docs/README.md) folder:
+- [Programmable Metrics & Custom Logic](./docs/CUSTOM_LOGIC.md)
+- [View Management & Cloning](./docs/VIEW_MANAGEMENT.md)
+- [Layout & Card Management](./docs/LAYOUT_MANAGEMENT.md)
+- [Backup & Portability (Import/Export)](./docs/IMPORT_EXPORT.md)
+
 ## Deployment
 
 ### Deploy to Vercel
