@@ -1,3 +1,3 @@
-export default defineEventHandler(async () => {
-    return await fetchGithubOrgs();
+export default defineEventHandler(async (event) => {
+    return await fetchGithubOrgs(event);
 });

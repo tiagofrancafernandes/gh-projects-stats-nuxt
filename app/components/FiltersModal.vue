@@ -125,39 +125,6 @@ function clear() {
                         </button>
                     </div>
                 </div>
-
-                <!-- Layout -->
-                <div class="space-y-3 pt-6 border-t border-zinc-800">
-                    <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold text-zinc-500 uppercase tracking-widest">
-                            Dashboard Layout
-                        </label>
-                        <button
-                            @click="$emit('resetLayout')"
-                            class="text-[10px] text-blue-500 hover:text-blue-400 font-bold uppercase"
-                        >
-                            Reset
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button
-                            v-for="item in layout"
-                            :key="item.id"
-                            @click="$emit('toggleVisibility', item.id)"
-                            :class="[
-                                'flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all border text-left',
-                                item.visible
-                                    ? 'bg-zinc-800 border-zinc-700 text-zinc-200'
-                                    : 'bg-zinc-900 border-zinc-800 text-zinc-600 opacity-50',
-                            ]"
-                        >
-                            <iconify-icon
-                                :icon="item.visible ? 'mdi:eye-outline' : 'mdi:eye-off-outline'"
-                            ></iconify-icon>
-                            <span class="truncate">{{ item.title }}</span>
-                        </button>
-                    </div>
-                </div>
             </div>
 
             <!-- Footer -->

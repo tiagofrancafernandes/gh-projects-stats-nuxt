@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const rawItems = await fetchGithubProjectItems(org, project);
+    const rawItems = await fetchGithubProjectItems(org, project, event);
     const cards = rawItems.map(mapGithubItem);
     const stats = aggregateStats(cards);
 

@@ -19,4 +19,10 @@ export default defineNuxtConfig({
     future: {
         compatibilityVersion: 4,
     },
+    runtimeConfig: {
+        // 🔒 Private - server only
+        githubToken: process.env.GITHUB_TOKEN,
+        allowGithubViaOAuth: ['true', '1', 'on', true].includes(process.env.GITHUB_VIA_OAUTH ?? false),
+        mockOrgsAllowed: ['true', '1', 'on', true].includes(process.env.MOCK_ORGS_ALLOWED ?? false),
+    },
 });

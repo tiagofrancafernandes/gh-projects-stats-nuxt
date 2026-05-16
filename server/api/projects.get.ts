@@ -9,5 +9,5 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    return await fetchGithubProjects(owner);
+    return await fetchGithubProjects(owner, event);
 });

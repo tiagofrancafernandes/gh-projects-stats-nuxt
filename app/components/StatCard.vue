@@ -24,14 +24,6 @@ defineEmits(['expand']);
             class="absolute -left-8 -bottom-8 w-32 h-32 bg-purple-500/5 blur-[80px] rounded-full group-hover:bg-purple-500/10 transition-all duration-500"
         ></div>
 
-        <!-- Drag Handle -->
-        <div
-            v-if="showHandle"
-            class="absolute left-1/2 -top-1 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-move z-20"
-        >
-            <iconify-icon icon="mdi:drag-horizontal" class="text-2xl text-zinc-600"></iconify-icon>
-        </div>
-
         <div class="flex items-center justify-between mb-4 w-full relative z-10">
             <span class="text-zinc-500 text-xs font-bold uppercase tracking-widest">{{ title }}</span>
             <div class="flex items-center gap-2">

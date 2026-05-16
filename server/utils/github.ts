@@ -1,3 +1,6 @@
+import type { H3Event } from 'h3';
+import type { NitroRuntimeConfig } from 'nitropack/types';
+
 import type { GithubCard, GithubOrg, GithubProject } from '~/types/github';
 
 let cache: { data: any; timestamp: number; key: string } | null = null;
@@ -14,13 +17,49 @@ function setCache(key: string, data: any) {
     cache = { key, data, timestamp: Date.now() };
 }
 
-export async function fetchGithubOrgs(): Promise<GithubOrg[]> {
-    const config = useRuntimeConfig();
+export function getRuntimeConfig(
+    runtimeConfig: NitroRuntimeConfig | null = null,
+    event: H3Event | null | undefined = null
+) {
+    if (event) {
+        return useRuntimeConfig(event || undefined);
+    }
+
+    return runtimeConfig || useRuntimeConfig(event || undefined);
+}
+
+export function getGithubToken(event: H3Event | null | undefined = null, safe: boolean | null | undefined = null) {
+    const config = getRuntimeConfig(null, event);
     const token = config.githubToken || process.env.GITHUB_TOKEN;
 
-    if (!token) return getMockOrgs();
+    if (!token && !safe) {
+        throw createError({
+            statusCode: 500,
+            statusMessage: 'GITHUB_TOKEN was not set',
+        });
+    }
+
+    return token;
+}
+
+export async function fetchGithubOrgs(event: H3Event | null | undefined = null): Promise<GithubOrg[]> {
+    const config = getRuntimeConfig(null, event);
+    let mockOrgsAllowed = Boolean(config.mockOrgsAllowed);
+    const token = getGithubToken(event, /* safe */ true);
+
+    if (!token && mockOrgsAllowed) {
+        return getMockOrgs();
+    }
+
+    if (!token) {
+        throw createError({
+            statusCode: 500,
+            statusMessage: 'GITHUB_TOKEN was not set',
+        });
+    }
 
     const cached = getCache('orgs');
+
     if (cached) return cached;
 
     const query = `
@@ -58,11 +97,21 @@ export async function fetchGithubOrgs(): Promise<GithubOrg[]> {
     return orgs;
 }
 
-export async function fetchGithubProjects(owner: string): Promise<GithubProject[]> {
-    const config = useRuntimeConfig();
-    const token = config.githubToken || process.env.GITHUB_TOKEN;
+export async function fetchGithubProjects(
+    owner: string,
+    event: H3Event | null | undefined = null
+): Promise<GithubProject[]> {
+    const config = getRuntimeConfig(null, event);
+    const mockOrgsAllowed = Boolean(config.mockOrgsAllowed);
+    const token = getGithubToken(event, /* safe */ true);
 
-    if (!token) return getMockProjects(owner);
+    if (!token && mockOrgsAllowed) return getMockProjects(owner);
+    if (!token) {
+        throw createError({
+            statusCode: 500,
+            statusMessage: 'GITHUB_TOKEN was not set',
+        });
+    }
 
     const cached = getCache(`projects:${owner}`);
     if (cached) return cached;
@@ -93,11 +142,22 @@ export async function fetchGithubProjects(owner: string): Promise<GithubProject[
     return projects;
 }
 
-export async function fetchGithubProjectItems(org: string, projectNumber: number) {
-    const config = useRuntimeConfig();
-    const token = config.githubToken || process.env.GITHUB_TOKEN;
+export async function fetchGithubProjectItems(
+    org: string,
+    projectNumber: number,
+    event: H3Event | null | undefined = null
+) {
+    const config = getRuntimeConfig(null, event);
+    const mockOrgsAllowed = Boolean(config.mockOrgsAllowed);
+    const token = getGithubToken(event, /* safe */ true);
 
-    if (!token) return getMockData();
+    if (!token && mockOrgsAllowed) return getMockData();
+    if (!token) {
+        throw createError({
+            statusCode: 500,
+            statusMessage: 'GITHUB_TOKEN was not set',
+        });
+    }
 
     const cacheKey = `items:${org}:${projectNumber}`;
     const cached = getCache(cacheKey);

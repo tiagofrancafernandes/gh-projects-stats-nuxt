@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     const statesFilter = (query.states as string)?.split(',').filter(Boolean);
     const statusFilter = (query.status as string)?.split(',').filter(Boolean);
 
-    const rawItems = await fetchGithubProjectItems(org, project);
+    const rawItems = await fetchGithubProjectItems(org, project, event);
     let cards: GithubCard[] = rawItems.map(mapGithubItem);
 
     if (labelsFilter?.length) {
