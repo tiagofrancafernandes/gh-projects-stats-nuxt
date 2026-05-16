@@ -16,5 +16,12 @@ export default defineEventHandler(async (event) => {
     const cards = rawItems.map(mapGithubItem);
     const stats = aggregateStats(cards);
 
-    return stats;
+    // Fetch project title
+    const projects = await fetchGithubProjects(org, event);
+    const projectInfo = projects.find((p) => p.number === project);
+
+    return {
+        ...stats,
+        projectTitle: projectInfo?.title || `Project #${project}`,
+    };
 });

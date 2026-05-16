@@ -153,7 +153,10 @@ function handleDragEnd() {
                         </div>
                         <div class="text-left">
                             <div class="text-xs font-bold text-zinc-500 uppercase tracking-widest">{{ org }}</div>
-                            <div class="text-sm font-bold text-zinc-100">Project #{{ project }}</div>
+                            <div class="text-sm font-bold text-zinc-100">
+                                <span class="text-zinc-500 mr-1">(#{{ project }})</span>
+                                {{ stats?.projectTitle || 'Loading...' }}
+                            </div>
                         </div>
                     </NuxtLink>
                 </div>
