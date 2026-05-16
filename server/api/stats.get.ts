@@ -12,6 +12,13 @@ export default defineEventHandler(async (event) => {
         });
     }
 
+    if (!isOrgAllowed(owner, event) || !isProjectAllowed(project, event)) {
+        throw createError({
+            statusCode: 403,
+            statusMessage: 'Access denied to this organization or project',
+        });
+    }
+
     const rawItems = await fetchGithubProjectItems(owner, project, event);
     const cards = rawItems.map(mapGithubItem);
     const stats = aggregateStats(cards);

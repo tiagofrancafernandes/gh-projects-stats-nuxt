@@ -28,5 +28,11 @@ export default defineNuxtConfig({
         defaultOrg: String((process.env.DEFAULT_GITHUB_ORG ?? process.env.DEFAULT_GITHUB_OWNER) || ''),
         defaultOwner: String((process.env.DEFAULT_GITHUB_OWNER ?? process.env.DEFAULT_GITHUB_ORG) || ''),
         defaultProject: process.env.DEFAULT_GITHUB_PROJECT,
+
+        // Filtering
+        allowedOrgs: process.env.ALLOWED_ORGS || '',
+        excludedOrgs: process.env.EXCLUDED_ORGS || '',
+        allowedProjects: process.env.ALLOWED_PROJECTS || '',
+        excludedProjects: process.env.EXCLUDED_PROJECTS || '',
     },
 });

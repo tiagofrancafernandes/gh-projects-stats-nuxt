@@ -10,6 +10,10 @@ export default defineEventHandler(async (event) => {
         return [];
     }
 
+    if (!isOrgAllowed(owner, event) || !isProjectAllowed(project, event)) {
+        return [];
+    }
+
     const labelsFilter = (query.labels as string)?.split(',').filter(Boolean);
     const statesFilter = (query.states as string)?.split(',').filter(Boolean);
     const statusFilter = (query.status as string)?.split(',').filter(Boolean);
