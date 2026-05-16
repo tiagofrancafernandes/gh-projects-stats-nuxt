@@ -24,9 +24,8 @@ const editFormat = ref(props.format || 'fixed');
 const editPrecision = ref(props.precision ?? 0);
 
 const formattedValue = computed(() => {
-    if (typeof props.value === 'string') return props.value;
-    const val = Number(props.value);
-    if (isNaN(val)) return props.value;
+    let val = Number(props.value);
+    if (isNaN(val)) val = 0;
 
     if (editFormat.value === 'percent') {
         return (val * 100).toFixed(editPrecision.value) + '%';

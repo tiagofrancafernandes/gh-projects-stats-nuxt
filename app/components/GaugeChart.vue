@@ -24,11 +24,16 @@ function save() {
     isEditing.value = false;
 }
 
-function cancel() {
+const cancel = () => {
     editTitle.value = props.title;
     editPath.value = props.path || '';
     isEditing.value = false;
-}
+};
+
+const displayValue = computed(() => {
+    const val = Number(props.value);
+    return isNaN(val) ? 0 : val;
+});
 
 const chartData = computed(() => ({
     labels: ['Velocity', 'Remaining'],
@@ -108,7 +113,7 @@ const chartOptions = computed(() => ({
                     <!-- Center Text -->
                     <div class="absolute inset-0 flex flex-col items-center justify-center mt-8">
                         <span class="font-bold text-zinc-100 tracking-tighter text-4xl">
-                            {{ value }}
+                            {{ displayValue }}
                         </span>
                         <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">Items / Week</span>
                     </div>
