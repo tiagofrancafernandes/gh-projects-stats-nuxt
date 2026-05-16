@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import 'iconify-icon';
 const { appSettings } = useAppConfig();
 const { theme } = appSettings || {};
 

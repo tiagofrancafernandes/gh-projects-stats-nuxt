@@ -6,11 +6,17 @@ export default defineNuxtConfig({
     devtools: {
         enabled: true,
     },
+    modules: ['@vueuse/nuxt'],
     vite: {
-        plugins: [
-            tailwindcss(),
-            //
-        ],
+        plugins: [tailwindcss()],
+    },
+    vue: {
+        compilerOptions: {
+            isCustomElement: (tag) => tag === 'iconify-icon',
+        },
     },
     css: ['./app/assets/css/main.css'],
+    future: {
+        compatibilityVersion: 4,
+    },
 });
