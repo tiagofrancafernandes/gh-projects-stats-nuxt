@@ -30,7 +30,7 @@ export function aggregateStats(cards: GithubCard[]): GithubStats {
         merged: 0,
         byStatus: {},
         byLabel: {},
-        customKey: 777,
+        customFnValue: null,
         velocity: [],
     };
 

@@ -71,9 +71,9 @@ function cancel() {
 
         <div v-if="!isEditing" class="flex flex-col h-full w-full relative z-10">
             <div class="flex items-center justify-between mb-4">
-                <span v-if="showLabel !== false" class="text-zinc-500 text-xs font-bold uppercase tracking-widest">{{
-                    title
-                }}</span>
+                <span v-if="showLabel !== false" class="text-zinc-500 text-xs font-bold uppercase tracking-widest">
+                    {{ title }}
+                </span>
                 <span v-else></span>
                 <div class="flex items-center gap-1">
                     <button
@@ -126,6 +126,8 @@ function cancel() {
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Card Title</label>
                     <input
+                        id="card-title"
+                        name="card-title"
                         v-model="editTitle"
                         type="text"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all"
@@ -134,11 +136,23 @@ function cancel() {
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="flex items-center gap-2">
-                        <input type="checkbox" v-model="editShowValue" id="showValue" class="rounded border-zinc-800 bg-zinc-950 text-blue-500" />
+                        <input
+                            type="checkbox"
+                            v-model="editShowValue"
+                            id="showValue"
+                            name="showValue"
+                            class="rounded border-zinc-800 bg-zinc-950 text-blue-500"
+                        />
                         <label for="showValue" class="text-[10px] font-bold text-zinc-500 uppercase">Show Value</label>
                     </div>
                     <div class="flex items-center gap-2">
-                        <input type="checkbox" v-model="editShowLabel" id="showLabel" class="rounded border-zinc-800 bg-zinc-950 text-blue-500" />
+                        <input
+                            type="checkbox"
+                            v-model="editShowLabel"
+                            id="showLabel"
+                            name="showLabel"
+                            class="rounded border-zinc-800 bg-zinc-950 text-blue-500"
+                        />
                         <label for="showLabel" class="text-[10px] font-bold text-zinc-500 uppercase">Show Label</label>
                     </div>
                 </div>
@@ -146,20 +160,35 @@ function cancel() {
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Format</label>
-                        <select v-model="editFormat" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100">
+                        <select
+                            id="card-format"
+                            name="card-format"
+                            v-model="editFormat"
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100"
+                        >
                             <option value="fixed">Fixed</option>
                             <option value="percent">Percentage</option>
                         </select>
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Precision</label>
-                        <input type="number" v-model.number="editPrecision" min="0" max="5" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100" />
+                        <input
+                            id="card-precision"
+                            name="card-precision"
+                            type="number"
+                            v-model.number="editPrecision"
+                            min="0"
+                            max="5"
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100"
+                        />
                     </div>
                 </div>
 
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Data Path</label>
                     <input
+                        id="card-path"
+                        name="card-path"
                         v-model="editPath"
                         type="text"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all font-mono"

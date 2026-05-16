@@ -19,6 +19,9 @@ const {
     saveView,
     loadView,
     deleteView,
+    cloneView,
+    addItem,
+    removeItem,
     exportConfig,
     importConfig,
 } = useDashboardLayout();
@@ -35,8 +38,15 @@ const itemSearch = ref('');
 
 // Dynamic auto refresh
 let refreshTimer: any = null;
+function clearRefreshTimer() {
+    if (refreshTimer) {
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+    }
+}
+
 function startRefreshTimer() {
-    if (refreshTimer) clearInterval(refreshTimer);
+    clearRefreshTimer();
     refreshTimer = setInterval(() => {
         if (!pendingCards.value && !pendingStats.value) {
             refresh();
@@ -48,6 +58,19 @@ onMounted(() => {
     startRefreshTimer();
     const route = useRoute();
     if (route.query.view === 'tv') focusMode.value = true;
+});
+
+onUnmounted(() => {
+    clearRefreshTimer();
+});
+
+watch(refreshInterval, () => {
+    startRefreshTimer();
+});
+
+watch(currentViewId, () => {
+    // Re-sync timer when switching views as interval might change
+    startRefreshTimer();
 });
 
 watch(focusMode, (val) => {
@@ -140,9 +163,13 @@ const currentViewName = computed(() => {
 
                     <div class="h-8 w-px bg-zinc-800 hidden md:block"></div>
 
-                    <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 border border-zinc-800 rounded-full">
+                    <div
+                        class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 border border-zinc-800 rounded-full"
+                    >
                         <iconify-icon icon="mdi:view-dashboard-outline" class="text-blue-500"></iconify-icon>
-                        <span class="text-xs font-bold text-zinc-100 uppercase tracking-wider">{{ currentViewName }}</span>
+                        <span class="text-xs font-bold text-zinc-100 uppercase tracking-wider">
+                            {{ currentViewName }}
+                        </span>
                     </div>
                 </div>
 
@@ -264,7 +291,9 @@ const currentViewName = computed(() => {
                                 class="p-6 border-b border-zinc-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4"
                             >
                                 <div class="flex items-center gap-4">
-                                    <div class="drag-handle cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity p-1 -ml-2 rounded hover:bg-zinc-800">
+                                    <div
+                                        class="drag-handle cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity p-1 -ml-2 rounded hover:bg-zinc-800"
+                                    >
                                         <iconify-icon icon="mdi:drag-variant" class="text-zinc-600"></iconify-icon>
                                     </div>
                                     <h3 class="text-sm font-bold text-zinc-100 uppercase tracking-widest">
@@ -374,7 +403,10 @@ const currentViewName = computed(() => {
                         </div>
 
                         <!-- Add drag handle to StatCard and other components if they don't have it -->
-                        <div v-if="item.type !== 'list' && !isEditing" class="drag-handle absolute top-6 left-2 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-zinc-800 z-20">
+                        <div
+                            v-if="item.type !== 'list'"
+                            class="drag-handle absolute top-6 left-2 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-zinc-800 z-20"
+                        >
                             <iconify-icon icon="mdi:drag-variant" class="text-zinc-600 text-xs"></iconify-icon>
                         </div>
                     </div>
@@ -407,6 +439,9 @@ const currentViewName = computed(() => {
             @save-view="saveView"
             @load-view="loadView"
             @delete-view="deleteView"
+            @clone-view="cloneView"
+            @add-item="addItem"
+            @remove-item="removeItem"
             @set-refresh-interval="refreshInterval = $event"
             @export="exportConfig"
             @import="importConfig"

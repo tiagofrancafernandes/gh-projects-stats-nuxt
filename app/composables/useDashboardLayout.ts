@@ -161,6 +161,42 @@ export function useDashboardLayout() {
         if (currentViewId.value === id) currentViewId.value = 'default';
     }
 
+    function cloneView(id: string) {
+        const view = views.value[id];
+        if (view) {
+            const newName = `${view.name} (Copy)`;
+            const newId = `${id}-copy-${Date.now()}`;
+            views.value[newId] = {
+                ...JSON.parse(JSON.stringify(view)),
+                id: newId,
+                name: newName,
+            };
+        }
+    }
+
+    function addItem(type: LayoutItem['type'] = 'stat') {
+        const id = `custom-${Date.now()}`;
+        layout.value.push({
+            id,
+            title: 'New Card',
+            visible: true,
+            cols: 1,
+            type,
+            path: '',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+        });
+    }
+
+    function removeItem(id: string) {
+        const index = layout.value.findIndex((i) => i.id === id);
+        if (index > -1) {
+            layout.value.splice(index, 1);
+        }
+    }
+
     function exportConfig() {
         const data = {
             layout: layout.value,
@@ -206,6 +242,9 @@ export function useDashboardLayout() {
         saveView,
         loadView,
         deleteView,
+        cloneView,
+        addItem,
+        removeItem,
         exportConfig,
         importConfig,
     };
