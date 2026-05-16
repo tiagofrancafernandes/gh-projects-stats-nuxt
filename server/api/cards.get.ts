@@ -3,10 +3,10 @@ import type { GithubCard } from '~/types/github';
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
-    const org = (query.org || query.owner) as string;
+    const owner = (query.org || query.owner) as string;
     const project = parseInt(query.project as string);
 
-    if (!org || isNaN(project)) {
+    if (!owner || isNaN(project)) {
         return [];
     }
 
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     const statesFilter = (query.states as string)?.split(',').filter(Boolean);
     const statusFilter = (query.status as string)?.split(',').filter(Boolean);
 
-    const rawItems = await fetchGithubProjectItems(org, project, event);
+    const rawItems = await fetchGithubProjectItems(owner, project, event);
     let cards: GithubCard[] = rawItems.map(mapGithubItem);
 
     if (labelsFilter?.length) {

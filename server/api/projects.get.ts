@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
-    const owner = query.owner as string;
+    const owner = (query.org || query.owner) as string;
 
     if (!owner) {
         throw createError({

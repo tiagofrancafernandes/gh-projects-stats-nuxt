@@ -2,22 +2,22 @@ import { mapGithubItem, aggregateStats } from '~/utils/githubMapper';
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
-    const org = (query.org || query.owner) as string;
+    const owner = (query.org || query.owner) as string;
     const project = parseInt(query.project as string);
 
-    if (!org || isNaN(project)) {
+    if (!owner || isNaN(project)) {
         throw createError({
             statusCode: 400,
             statusMessage: 'Org and Project are required',
         });
     }
 
-    const rawItems = await fetchGithubProjectItems(org, project, event);
+    const rawItems = await fetchGithubProjectItems(owner, project, event);
     const cards = rawItems.map(mapGithubItem);
     const stats = aggregateStats(cards);
 
     // Fetch project title
-    const projects = await fetchGithubProjects(org, event);
+    const projects = await fetchGithubProjects(owner, event);
     const projectInfo = projects.find((p) => p.number === project);
 
     return {
