@@ -28,7 +28,7 @@ const formattedValue = computed(() => {
     if (isNaN(val)) val = 0;
 
     if (editFormat.value === 'percent') {
-        return (val * 100).toFixed(editPrecision.value) + '%';
+        return val.toFixed(editPrecision.value) + '%';
     }
     return val.toFixed(editPrecision.value);
 });
