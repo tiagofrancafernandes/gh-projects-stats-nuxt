@@ -2,7 +2,7 @@ import { mapGithubItem, aggregateStats } from '~/utils/githubMapper';
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
-    const org = query.org as string;
+    const org = (query.org || query.owner) as string;
     const project = parseInt(query.project as string);
 
     if (!org || isNaN(project)) {
