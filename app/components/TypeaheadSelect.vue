@@ -48,8 +48,8 @@ function open() {
     <div ref="containerRef" class="relative w-full">
         <div
             @click="open"
-            class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 flex items-center justify-between cursor-pointer hover:border-zinc-700 transition-all group"
-            :class="{ 'ring-2 ring-blue-500/50 border-blue-500/50': isOpen }"
+            class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 flex items-center justify-between cursor-pointer hover:border-zinc-700 transition-all group"
+            :class="{ 'ring-1 ring-white/20 border-zinc-500': isOpen }"
         >
             <div class="flex items-center gap-3 overflow-hidden">
                 <iconify-icon icon="mdi:magnify" class="text-zinc-500 group-hover:text-zinc-300"></iconify-icon>
@@ -81,7 +81,7 @@ function open() {
         >
             <div
                 v-if="isOpen"
-                class="absolute z-50 w-full mt-2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl max-h-64 overflow-y-auto"
+                class="absolute z-50 w-full mt-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl max-h-64 overflow-y-auto"
             >
                 <div v-if="loading" class="p-4 flex justify-center">
                     <div class="w-5 h-5 border-2 border-zinc-700 border-t-zinc-400 rounded-full animate-spin"></div>

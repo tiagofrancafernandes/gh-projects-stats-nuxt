@@ -13,11 +13,11 @@ defineEmits(['expand']);
 
 <template>
     <div
-        class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-2xl p-6 hover:border-zinc-700 transition-all group relative"
+        class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all group relative"
         :class="{ 'h-full flex flex-col justify-center items-center': isExpanded }"
     >
-        <!-- Decoration Container (to allow tooltips to overflow the main card) -->
-        <div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+        <!-- Decoration Container -->
+        <div class="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
             <div
                 class="absolute -right-8 -top-8 w-32 h-32 bg-blue-500/10 blur-[80px] rounded-full group-hover:bg-blue-500/20 transition-all duration-500"
             ></div>
@@ -32,11 +32,11 @@ defineEmits(['expand']);
                 <button
                     @click.stop="$emit('expand')"
                     :data-tooltip="isExpanded ? 'Minimize' : 'Expand'"
-                    class="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-all"
+                    class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm"
                 >
                     <iconify-icon
                         :icon="isExpanded ? 'mdi:fullscreen-exit' : 'mdi:fullscreen'"
-                        class="text-lg"
+                        class="text-base"
                     ></iconify-icon>
                 </button>
                 <div v-if="icon" class="text-zinc-500 group-hover:text-zinc-300 transition-colors">

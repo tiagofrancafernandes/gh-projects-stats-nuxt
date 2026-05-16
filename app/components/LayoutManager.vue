@@ -63,7 +63,7 @@ function moveItem(index: number, direction: 'up' | 'down') {
         class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-opacity"
     >
         <div
-            class="bg-zinc-950 border border-zinc-800 rounded-3xl w-full max-w-2xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-300"
+            class="bg-zinc-950 border border-zinc-800 rounded-xl w-full max-w-2xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in duration-300"
         >
             <!-- Header -->
             <div class="p-8 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/20">
@@ -71,11 +71,8 @@ function moveItem(index: number, direction: 'up' | 'down') {
                     <h2 class="text-2xl font-bold text-zinc-100 tracking-tight">Dashboard Layout</h2>
                     <p class="text-zinc-500 text-sm mt-1">Customize your experience and saved views</p>
                 </div>
-                <button
-                    @click="emit('close')"
-                    class="p-2 rounded-xl hover:bg-zinc-800 text-zinc-500 hover:text-white transition-all"
-                >
-                    <iconify-icon icon="mdi:close" class="text-2xl"></iconify-icon>
+                <button @click="emit('close')" class="btn btn-ghost p-2">
+                    <iconify-icon icon="mdi:close" class="text-xl"></iconify-icon>
                 </button>
             </div>
 
@@ -86,9 +83,9 @@ function moveItem(index: number, direction: 'up' | 'down') {
                     :key="tab"
                     @click="activeTab = tab"
                     :class="[
-                        'py-4 text-sm font-bold uppercase tracking-widest transition-all border-b-2 px-1',
+                        'py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 px-1',
                         activeTab === tab
-                            ? 'border-blue-500 text-blue-500'
+                            ? 'border-white text-white'
                             : 'border-transparent text-zinc-500 hover:text-zinc-300',
                     ]"
                 >
@@ -103,7 +100,7 @@ function moveItem(index: number, direction: 'up' | 'down') {
                     <div
                         v-for="(item, index) in layout"
                         :key="item.id"
-                        class="group flex items-center gap-4 p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/50 hover:border-zinc-700 transition-all"
+                        class="group flex items-center gap-4 p-3 rounded-lg bg-zinc-900/40 border border-zinc-800 hover:border-zinc-700 transition-all"
                     >
                         <!-- Drag/Move Handles -->
                         <div class="flex flex-col gap-1">
@@ -126,14 +123,12 @@ function moveItem(index: number, direction: 'up' | 'down') {
                         <!-- Visibility -->
                         <button
                             @click="emit('toggleVisibility', item.id)"
-                            :class="[
-                                'p-3 rounded-xl transition-all',
-                                item.visible ? 'bg-blue-500/10 text-blue-500' : 'bg-zinc-800 text-zinc-600 grayscale',
-                            ]"
+                            class="btn btn-outline p-2.5"
+                            :class="{ 'text-white border-zinc-500': item.visible }"
                         >
                             <iconify-icon
                                 :icon="item.visible ? 'mdi:eye' : 'mdi:eye-off'"
-                                class="text-xl"
+                                class="text-lg"
                             ></iconify-icon>
                         </button>
 
@@ -146,7 +141,7 @@ function moveItem(index: number, direction: 'up' | 'down') {
                         </div>
 
                         <!-- Width Selector -->
-                        <div class="flex items-center gap-2 bg-zinc-950 p-1 rounded-xl border border-zinc-800">
+                        <div class="flex items-center gap-1 bg-zinc-950 p-1 rounded-md border border-zinc-800">
                             <button
                                 v-for="w in 4"
                                 :key="w"
@@ -177,12 +172,7 @@ function moveItem(index: number, direction: 'up' | 'down') {
                                 class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500 transition-all"
                                 @keyup.enter="handleSaveView"
                             />
-                            <button
-                                @click="handleSaveView"
-                                class="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-500 transition-all"
-                            >
-                                Save
-                            </button>
+                            <button @click="handleSaveView" class="btn btn-white px-6">Save</button>
                         </div>
                     </div>
 
@@ -203,10 +193,10 @@ function moveItem(index: number, direction: 'up' | 'down') {
                             <div
                                 v-for="view in views"
                                 :key="view.id"
-                                class="flex items-center justify-between p-4 rounded-2xl border transition-all"
+                                class="flex items-center justify-between p-3 rounded-lg border transition-all"
                                 :class="
                                     currentViewId === view.id
-                                        ? 'bg-blue-500/5 border-blue-500/30'
+                                        ? 'bg-zinc-900 border-zinc-500'
                                         : 'bg-zinc-900/40 border-zinc-800 hover:border-zinc-700'
                                 "
                             >
@@ -227,10 +217,7 @@ function moveItem(index: number, direction: 'up' | 'down') {
                                     </span>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button
-                                        @click="emit('loadView', view.id)"
-                                        class="px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 text-xs font-bold hover:bg-zinc-700 transition-all"
-                                    >
+                                    <button @click="emit('loadView', view.id)" class="btn btn-black btn-sm">
                                         Load
                                     </button>
                                     <button
@@ -313,12 +300,7 @@ function moveItem(index: number, direction: 'up' | 'down') {
                 <div class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
                     v2.0 • Local Persistence Enabled
                 </div>
-                <button
-                    @click="emit('close')"
-                    class="px-8 py-3 bg-zinc-100 text-zinc-950 rounded-2xl text-sm font-bold hover:bg-white transition-all shadow-[0_10px_20px_-10px_rgba(255,255,255,0.2)]"
-                >
-                    Done
-                </button>
+                <button @click="emit('close')" class="btn btn-white px-8">Done</button>
             </div>
         </div>
     </div>

@@ -44,7 +44,7 @@ function handleProjectSelect(project: GithubProject) {
         <div class="w-full max-w-xl relative z-10">
             <div class="text-center mb-12">
                 <div
-                    class="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/10"
+                    class="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-500/10"
                 >
                     <iconify-icon icon="mdi:github" class="text-3xl text-zinc-100"></iconify-icon>
                 </div>
@@ -84,7 +84,7 @@ function handleProjectSelect(project: GithubProject) {
                     <div class="flex items-center gap-2 mb-4">
                         <button
                             @click="currentStep = 'ORG_SELECT'"
-                            class="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1"
+                            class="btn btn-ghost btn-sm text-zinc-500 hover:text-zinc-300"
                         >
                             <iconify-icon icon="mdi:arrow-left"></iconify-icon>
                             Back

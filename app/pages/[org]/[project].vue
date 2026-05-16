@@ -101,7 +101,7 @@ function handleReorder(newLayout: any[]) {
                 <div class="flex items-center gap-8">
                     <NuxtLink to="/" class="flex items-center gap-3 group">
                         <div
-                            class="w-10 h-10 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center group-hover:border-zinc-700 transition-all"
+                            class="w-10 h-10 bg-zinc-900 border border-zinc-800 rounded-lg flex items-center justify-center group-hover:border-zinc-700 transition-all"
                         >
                             <iconify-icon
                                 icon="mdi:github"
@@ -109,10 +109,10 @@ function handleReorder(newLayout: any[]) {
                             ></iconify-icon>
                         </div>
                         <div class="text-left">
-                            <div class="text-xs font-bold text-zinc-500 uppercase tracking-widest">
+                            <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
                                 {{ ownerRef }}
                             </div>
-                            <div class="text-sm font-bold text-zinc-100">
+                            <div class="text-sm font-semibold text-zinc-100">
                                 <span class="text-zinc-500 mr-1">(#{{ projectNumber }})</span>
                                 {{ stats?.projectTitle || 'Loading...' }}
                             </div>
@@ -121,41 +121,25 @@ function handleReorder(newLayout: any[]) {
                 </div>
 
                 <div class="flex items-center gap-4">
-                    <button
-                        @click="refresh"
-                        data-tooltip="Refresh"
-                        class="p-2.5 rounded-xl border border-zinc-800 hover:bg-zinc-900 text-zinc-400 transition-all"
-                    >
+                    <button @click="refresh" data-tooltip="Refresh" class="btn btn-outline">
                         <iconify-icon
                             icon="mdi:refresh"
                             :class="{ 'animate-spin': pendingCards || pendingStats }"
-                            class="text-xl"
+                            class="text-lg"
                         ></iconify-icon>
                     </button>
 
                     <div class="h-6 w-px bg-zinc-800 mx-2"></div>
 
-                    <button
-                        @click="focusMode = true"
-                        data-tooltip="TV Mode"
-                        class="p-2.5 rounded-xl border border-zinc-800 hover:bg-zinc-900 text-zinc-400 transition-all"
-                    >
-                        <iconify-icon icon="mdi:monitor-dashboard" class="text-xl"></iconify-icon>
+                    <button @click="focusMode = true" data-tooltip="TV Mode" class="btn btn-outline">
+                        <iconify-icon icon="mdi:monitor-dashboard" class="text-lg"></iconify-icon>
                     </button>
 
-                    <button
-                        @click="isLayoutOpen = true"
-                        data-tooltip="Customize Layout"
-                        class="p-2.5 rounded-xl border border-zinc-800 hover:bg-zinc-900 text-zinc-400 transition-all"
-                    >
-                        <iconify-icon icon="mdi:view-dashboard-edit" class="text-xl"></iconify-icon>
+                    <button @click="isLayoutOpen = true" data-tooltip="Customize Layout" class="btn btn-outline">
+                        <iconify-icon icon="mdi:view-dashboard-edit" class="text-lg"></iconify-icon>
                     </button>
 
-                    <button
-                        @click="isFiltersOpen = true"
-                        data-tooltip="Filters"
-                        class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-500 transition-all shadow-[0_10px_20px_-10px_rgba(59,130,246,0.3)]"
-                    >
+                    <button @click="isFiltersOpen = true" data-tooltip="Filters" class="btn btn-white">
                         <iconify-icon icon="mdi:filter-variant" class="text-lg"></iconify-icon>
                         Filters
                     </button>
@@ -171,10 +155,10 @@ function handleReorder(newLayout: any[]) {
             <button
                 @click="focusMode = false"
                 data-tooltip="Exit TV Mode"
-                class="pointer-events-auto p-3 px-6 rounded-full bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 text-zinc-400 hover:text-white transition-all opacity-0 group-hover:opacity-100 translate-y-[-20px] group-hover:translate-y-0 shadow-2xl flex items-center gap-2"
+                class="pointer-events-auto btn btn-black px-6 shadow-2xl opacity-0 group-hover:opacity-100 translate-y-[-20px] group-hover:translate-y-0"
             >
-                <iconify-icon icon="mdi:close" class="text-xl"></iconify-icon>
-                <span class="text-xs font-bold uppercase tracking-widest">Exit TV Mode</span>
+                <iconify-icon icon="mdi:close" class="text-lg"></iconify-icon>
+                <span class="text-[10px] font-semibold uppercase tracking-wider">Exit TV Mode</span>
             </button>
         </div>
 
@@ -282,7 +266,7 @@ function handleReorder(newLayout: any[]) {
                                             v-model="itemSearch"
                                             type="text"
                                             placeholder="Filter by title..."
-                                            class="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-xl pl-10 pr-4 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
+                                            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg pl-10 pr-4 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-all"
                                         />
                                     </div>
                                 </div>
@@ -290,13 +274,13 @@ function handleReorder(newLayout: any[]) {
                                 <div class="overflow-x-auto flex-1">
                                     <table class="w-full text-left">
                                         <thead
-                                            class="bg-[#080808] text-zinc-600 text-[10px] font-bold uppercase tracking-widest"
+                                            class="bg-zinc-900/30 text-zinc-500 text-[10px] font-semibold uppercase tracking-wider"
                                         >
                                             <tr>
-                                                <th class="px-6 py-4">Content</th>
-                                                <th class="px-6 py-4">Labels</th>
-                                                <th class="px-6 py-4">Status</th>
-                                                <th class="px-6 py-4">State</th>
+                                                <th class="px-6 py-3">Content</th>
+                                                <th class="px-6 py-3">Labels</th>
+                                                <th class="px-6 py-3">Status</th>
+                                                <th class="px-6 py-3">State</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-zinc-800/30">
@@ -326,7 +310,7 @@ function handleReorder(newLayout: any[]) {
                                                         <a
                                                             :href="`https://github.com/${ownerRef}/${projectNumber}/issues/${card.id}`"
                                                             target="_blank"
-                                                            class="text-sm font-semibold text-zinc-300 hover:text-blue-400 transition-colors line-clamp-1"
+                                                            class="text-sm font-medium text-zinc-300 hover:text-white transition-colors line-clamp-1"
                                                         >
                                                             {{ card.title }}
                                                         </a>
@@ -409,7 +393,7 @@ function handleReorder(newLayout: any[]) {
             v-if="!focusMode"
             @click="isLayoutOpen = true"
             data-tooltip="Customize Layout"
-            class="fixed bottom-8 left-8 p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-white transition-all shadow-2xl"
+            class="fixed bottom-8 left-8 btn btn-black p-3 shadow-2xl"
         >
             <iconify-icon icon="mdi:view-dashboard-edit" class="text-xl"></iconify-icon>
         </button>

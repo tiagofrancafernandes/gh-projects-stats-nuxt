@@ -1,7 +1,6 @@
 <template></template>
 
 <script setup lang="ts">
-
 const config = useRuntimeConfig();
 
 const defaultOwner = config.defaultOwner || config.defaultOrg || null;
@@ -9,7 +8,7 @@ const defaultProject = parseInt(config.defaultProject) || null;
 
 if (!defaultOwner || !defaultProject) {
     await navigateTo({
-        path: '/'
+        path: '/',
     });
 }
 
@@ -27,7 +26,8 @@ const targetPath = [
     //
 ]
     .filter(Boolean)
-    .join('/').trim();
+    .join('/')
+    .trim();
 
 // /tiagofrancafernandes/1?states=OPEN
 await navigateTo({

@@ -54,13 +54,13 @@ function clear() {
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
     >
         <div
-            class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200"
+            class="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200"
         >
             <!-- Header -->
             <div class="p-6 border-b border-zinc-800 flex items-center justify-between">
                 <h2 class="text-xl font-semibold text-zinc-100">Filters</h2>
-                <button @click="emit('close')" class="text-zinc-500 hover:text-zinc-300 transition-colors">
-                    <iconify-icon icon="mdi:close" class="text-2xl"></iconify-icon>
+                <button @click="emit('close')" class="btn btn-ghost p-1.5">
+                    <iconify-icon icon="mdi:close" class="text-xl"></iconify-icon>
                 </button>
             </div>
 
@@ -74,12 +74,8 @@ function clear() {
                             v-for="state in ['OPEN', 'CLOSED']"
                             :key="state"
                             @click="localFilters.states = localFilters.states.includes(state) ? [] : [state]"
-                            :class="[
-                                'px-4 py-2 rounded-lg text-sm font-medium transition-all border',
-                                localFilters.states.includes(state)
-                                    ? 'bg-blue-600 border-blue-500 text-white'
-                                    : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600',
-                            ]"
+                            class="btn flex-1"
+                            :class="localFilters.states.includes(state) ? 'btn-white' : 'btn-outline'"
                         >
                             {{ state }}
                         </button>
@@ -94,12 +90,8 @@ function clear() {
                             v-for="status in availableStatuses"
                             :key="status"
                             @click="localFilters.status = localFilters.status.includes(status) ? [] : [status]"
-                            :class="[
-                                'px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                                localFilters.status.includes(status)
-                                    ? 'bg-zinc-100 border-zinc-100 text-zinc-900'
-                                    : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600',
-                            ]"
+                            class="btn btn-sm"
+                            :class="localFilters.status.includes(status) ? 'btn-white' : 'btn-outline'"
                         >
                             {{ status }}
                         </button>
@@ -114,12 +106,8 @@ function clear() {
                             v-for="label in availableLabels"
                             :key="label"
                             @click="toggleLabel(label)"
-                            :class="[
-                                'px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                                localFilters.labels.includes(label)
-                                    ? 'bg-purple-600 border-purple-500 text-white'
-                                    : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600',
-                            ]"
+                            class="btn btn-sm"
+                            :class="localFilters.labels.includes(label) ? 'btn-white' : 'btn-outline'"
                         >
                             {{ label }}
                         </button>
@@ -129,18 +117,8 @@ function clear() {
 
             <!-- Footer -->
             <div class="p-6 bg-zinc-900/50 border-t border-zinc-800 flex gap-3">
-                <button
-                    @click="clear"
-                    class="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-zinc-400 hover:bg-zinc-800 transition-colors"
-                >
-                    Clear All
-                </button>
-                <button
-                    @click="apply"
-                    class="flex-[2] px-4 py-2.5 rounded-xl text-sm font-semibold bg-zinc-100 text-zinc-900 hover:bg-white transition-colors"
-                >
-                    Apply Filters
-                </button>
+                <button @click="clear" class="flex-1 btn btn-ghost">Clear All</button>
+                <button @click="apply" class="flex-[2] btn btn-white">Apply Filters</button>
             </div>
         </div>
     </div>
