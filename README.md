@@ -4,18 +4,33 @@
 
 A professional, high-performance dashboard for visualizing GitHub Projects v2 metrics. Built with Nuxt 4, Tailwind CSS, and Chart.js.
 
-## Features
+## Key Features
 
-- **Multi-Step Selection Flow**: Easily browse through Organizations/Users and their Projects.
-- **Real-time Metrics**: Aggregate counts for Total Items, Open/Closed states, and Merged Pull Requests.
-- **Dynamic Charts**:
-  - **Velocity**: Items created vs. updated over time.
-  - **Status Distribution**: Pie chart showing items by their current status.
-  - **Label Distribution**: Pie chart showing items by their labels.
-- **TV / Focus Mode**: A distraction-free mode for displaying on big screens.
-- **Expanded Card View**: Click any card or chart to view it in full screen.
-- **Advanced Filtering**: Filter items by labels, states (Issue/PR/Draft), and project status.
-- **Modern UI**: Dark-themed, glassmorphic design inspired by Linear and Vercel.
+### 🚀 Smart Selection & Discovery
+- **Multi-Step Selection Flow**: Seamlessly browse through Organizations, Users, and their Projects v2.
+- **Typeahead Search**: Intelligent search across all organizations and projects for lightning-fast navigation.
+- **Access Control & Filtering**: Restrict visibility using `ALLOWED_ORGS` or `EXCLUDED_PROJECTS` environment variables for secure, tailored experiences.
+
+### 📊 Advanced Data Visualization
+- **Real-time Metrics**: Dynamic aggregate counts for Total Items, Open/Closed states, and Merged Pull Requests.
+- **Programmable Metrics (Custom Logic)**: Create cards with custom JavaScript logic to perform complex calculations, data merging, or conditional formatting.
+- **Interactive Charts**:
+  - **Velocity Charts**: Track items created vs. updated over time.
+  - **Status & Label Distribution**: Visual breakdowns of your project's health and organization.
+- **Expanded Views**: Click any card or chart to view detailed data in full-screen mode.
+
+### 🛠️ Layout & View Management
+- **Dynamic Grid System**: Resize cards (1/4 to 4/4 width) to prioritize the metrics that matter most.
+- **Nested Grouping**: Cluster related cards into containers to organize complex dashboards.
+- **Drag-and-Drop Reordering**: Intuitive interface to rearrange your layout in seconds.
+- **Multiple Saved Views**: Create, clone, and switch between different dashboard configurations (e.g., "Daily Standup", "Monthly Report").
+- **Smart Save Workflow**: Non-intrusive floating action button (FAB) for quick updates or "Save As..." new views.
+
+### 📺 High-Performance UX
+- **TV / Focus Mode**: A dedicated, distraction-free mode optimized for big screens and ultra-wide monitors.
+- **Premium Aesthetics**: A stunning dark-themed, glassmorphic design inspired by modern tools like Linear.
+- **Import/Export**: Full portability for your configurations via JSON backups.
+- **Responsive Design**: Fully functional across desktop and large-scale displays.
 
 ## Tech Stack
 
