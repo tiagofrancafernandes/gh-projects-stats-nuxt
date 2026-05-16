@@ -443,8 +443,8 @@ function handleDragEnd() {
             @toggle-visibility="toggleVisibility"
             @reset-layout="
                 () => {
-                    localStorage.removeItem('dashboard-layout');
-                    window.location.reload();
+                    safeLocalStorage.removeItem('dashboard-layout');
+                    safeWindow.location.reload();
                 }
             "
         />

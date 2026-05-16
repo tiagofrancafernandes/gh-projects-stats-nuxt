@@ -19,7 +19,7 @@ export function useDashboardLayout() {
     const layout = ref<LayoutItem[]>([]);
 
     onMounted(() => {
-        const saved = localStorage.getItem('dashboard-layout');
+        const saved = safeLocalStorage.getItem('dashboard-layout');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -39,7 +39,7 @@ export function useDashboardLayout() {
     watch(
         layout,
         (newVal) => {
-            localStorage.setItem('dashboard-layout', JSON.stringify(newVal));
+            safeLocalStorage.setItem('dashboard-layout', JSON.stringify(newVal));
         },
         { deep: true }
     );
