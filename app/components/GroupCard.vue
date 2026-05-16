@@ -9,6 +9,7 @@ const props = defineProps<{
     loading?: boolean;
     isExpanded?: boolean;
     stats: any;
+    customResults?: Record<string, any>;
 }>();
 
 const emit = defineEmits(['expand', 'update', 'updateChild']);
@@ -24,6 +25,13 @@ function save() {
 function cancel() {
     editTitle.value = props.title;
     isEditing.value = false;
+}
+
+function resolveValue(item: any) {
+    if (item.customFn && props.customResults?.[item.id] !== undefined) {
+        return props.customResults[item.id];
+    }
+    return resolvePath(props.stats, item.path) ?? 0;
 }
 
 function resolvePath(obj: any, path: string | undefined) {
@@ -91,28 +99,30 @@ const localChildren = computed({
             handle=".drag-handle"
         >
             <template #item="{ element: item }">
-                <div v-if="item.visible" :class="[item.cols === 1 ? 'col-span-1' : 'col-span-2']">
+                <div v-if="item.visible" class="relative group" :class="[item.cols === 1 ? 'col-span-1' : 'col-span-2']">
                     <StatCard
                         v-if="item.type === 'stat'"
                         :title="item.title"
                         :path="item.path"
-                        :value="resolvePath(stats, item.path) ?? 0"
+                        :value="resolveValue(item)"
                         :loading="loading"
                         :show-value="item.showValue"
                         :show-label="item.showLabel"
                         :format="item.format"
                         :precision="item.precision"
                         :sub-label="item.subLabel"
+                        :custom-fn="item.customFn"
                         @update="$emit('updateChild', item.id, $event)"
                     />
                     <GaugeChart
                         v-else-if="item.type === 'gauge'"
                         :title="item.title"
                         :path="item.path"
-                        :value="resolvePath(stats, item.path) ?? 0"
+                        :value="resolveValue(item)"
                         :max="50"
                         :loading="loading"
                         :sub-label="item.subLabel"
+                        :custom-fn="item.customFn"
                         @update="$emit('updateChild', item.id, $event)"
                     />
                     <div v-else class="p-4 bg-zinc-900 rounded-xl text-[10px] text-zinc-600 uppercase font-bold text-center border border-zinc-800">

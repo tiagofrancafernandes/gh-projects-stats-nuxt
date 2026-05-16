@@ -5,7 +5,7 @@ const props = defineProps<{
     viewName?: string;
 }>();
 
-const emit = defineEmits(['close', 'save']);
+const emit = defineEmits(['close', 'save', 'minimize']);
 
 const name = ref(props.viewName || '');
 
@@ -17,7 +17,7 @@ watch(
 );
 
 function handleSave() {
-    if (!name.value) return;
+    if (!name.value && props.currentViewId === 'default') return;
     emit('save', name.value);
 }
 </script>
@@ -61,16 +61,29 @@ function handleSave() {
                     </p>
                 </div>
 
-                <div class="flex gap-3 pt-2">
+                <div class="space-y-3">
+                    <div class="flex gap-3 pt-2">
+                        <button
+                            @click="handleSave"
+                            class="flex-1 btn btn-white py-3 font-bold shadow-lg shadow-blue-500/10"
+                            :disabled="currentViewId === 'default' && !name"
+                        >
+                            {{ currentViewId === 'default' ? 'Save View' : 'Update Layout' }}
+                        </button>
+                        <button
+                            @click="$emit('close')"
+                            class="flex-1 btn btn-ghost py-3 font-bold border border-zinc-800"
+                        >
+                            Discard
+                        </button>
+                    </div>
+
                     <button
-                        @click="handleSave"
-                        class="flex-1 btn btn-white py-3 font-bold shadow-lg shadow-blue-500/10"
-                        :disabled="currentViewId === 'default' && !name"
+                        @click="$emit('minimize')"
+                        class="w-full btn btn-black py-3 font-bold border border-zinc-800 flex items-center justify-center gap-2"
                     >
-                        {{ currentViewId === 'default' ? 'Save View' : 'Update Layout' }}
-                    </button>
-                    <button @click="$emit('close')" class="flex-1 btn btn-ghost py-3 font-bold border border-zinc-800">
-                        Discard Changes
+                        <iconify-icon icon="mdi:pencil-outline"></iconify-icon>
+                        Continue Editing
                     </button>
                 </div>
             </div>

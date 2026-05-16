@@ -26,10 +26,28 @@ const {
     importConfig,
 } = useDashboardLayout();
 
+const { results: customResults, runAll: runCustomLogic } = useCustomLogic();
+
+function resolveValue(item: any) {
+    if (item.customFn && customResults.value[item.id] !== undefined) {
+        return customResults.value[item.id];
+    }
+    return resolvePath(stats.value, item.path) ?? 0;
+}
+
 function resolvePath(obj: any, path: string | undefined) {
     if (!path || !obj) return null;
     return path.split('.').reduce((prev, curr) => prev?.[curr], obj);
 }
+
+// Execute custom logic when data or layout changes
+watch(
+    [layout, stats, cards],
+    () => {
+        runCustomLogic(layout.value, stats.value, cards.value || []);
+    },
+    { deep: true, immediate: true }
+);
 
 const isFiltersOpen = ref(false);
 const isLayoutOpen = ref(false);
@@ -117,14 +135,28 @@ const colSpanClasses: Record<number, string> = {
 import draggable from 'vuedraggable';
 
 const isSaveViewOpen = ref(false);
+const isSaveViewMinimized = ref(false);
 
 function handleDragEnd() {
-    isSaveViewOpen.value = true;
+    if (!isSaveViewMinimized.value) {
+        isSaveViewOpen.value = true;
+    }
 }
 
 function handleSaveView(name: string) {
     saveView(name);
     isSaveViewOpen.value = false;
+    isSaveViewMinimized.value = false;
+}
+
+function minimizeSaveView() {
+    isSaveViewOpen.value = false;
+    isSaveViewMinimized.value = true;
+}
+
+function closeSaveView() {
+    isSaveViewOpen.value = false;
+    isSaveViewMinimized.value = false;
 }
 
 const currentViewName = computed(() => {
@@ -185,7 +217,8 @@ const currentViewName = computed(() => {
                     <div class="h-4 w-px bg-zinc-800 mx-1"></div>
 
                     <button @click="focusMode = true" v-tippy="'TV Mode'" class="btn btn-ghost">
-                        <iconify-icon icon="mdi:monitor-dashboard" class="text-lg"></iconify-icon>
+                        <!-- <iconify-icon icon="mdi:monitor-dashboard" class="text-lg"></iconify-icon> -->
+                        <iconify-icon icon="tdesign:tv" class="text-lg"></iconify-icon>
                     </button>
 
                     <button @click="isLayoutOpen = true" v-tippy="'Customize Layout'" class="btn btn-ghost">
@@ -216,12 +249,17 @@ const currentViewName = computed(() => {
         </div>
 
         <!-- Main Dashboard Content -->
-        <main class="max-w-7xl mx-auto px-8 transition-all duration-500" :class="[focusMode ? 'pt-8' : 'pt-28 pb-20']">
+        <main class="mx-auto transition-all duration-700 ease-in-out" :class="[
+            focusMode 
+                ? 'pt-12 pb-12 px-12 max-w-[95vw] lg:max-w-[1800px] 2xl:max-w-[2400px]' 
+                : 'pt-28 pb-20 px-8 max-w-7xl'
+        ]">
             <!-- Layout Grid -->
             <draggable
                 v-model="layout"
                 item-key="id"
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 transition-all duration-500"
+                :class="focusMode ? 'gap-10' : 'gap-6'"
                 handle=".drag-handle"
                 @end="handleDragEnd"
             >
@@ -230,14 +268,14 @@ const currentViewName = computed(() => {
                         v-if="item.visible"
                         :class="[
                             colSpanClasses[item.cols || 1],
-                            (item as any).isExpanded ? 'fixed inset-4 z-50 overflow-auto bg-[#050505] p-8' : 'relative',
+                            (item as any).isExpanded ? 'fixed inset-4 z-50 overflow-auto bg-[#050505] p-8' : 'relative group',
                         ]"
                     >
                         <StatCard
                             v-if="item.type === 'stat'"
                             :title="item.title"
                             :path="item.path"
-                            :value="resolvePath(stats, item.path) ?? 0"
+                            :value="resolveValue(item)"
                             :loading="pendingStats"
                             :is-expanded="(item as any).isExpanded"
                             :show-value="item.showValue"
@@ -245,6 +283,7 @@ const currentViewName = computed(() => {
                             :format="item.format"
                             :precision="item.precision"
                             :sub-label="item.subLabel"
+                            :custom-fn="item.customFn"
                             @expand="toggleExpand(item.id)"
                             @update="updateItem(item.id, $event)"
                         />
@@ -253,11 +292,12 @@ const currentViewName = computed(() => {
                             v-else-if="item.type === 'gauge'"
                             :title="item.title"
                             :path="item.path"
-                            :value="resolvePath(stats, item.path) ?? 0"
+                            :value="resolveValue(item)"
                             :max="50"
                             :loading="pendingStats"
                             :is-expanded="(item as any).isExpanded"
                             :sub-label="item.subLabel"
+                            :custom-fn="item.customFn"
                             @expand="toggleExpand(item.id)"
                             @update="updateItem(item.id, $event)"
                         />
@@ -268,6 +308,7 @@ const currentViewName = computed(() => {
                             :title="item.title"
                             :children="item.children || []"
                             :stats="stats"
+                            :custom-results="customResults"
                             :loading="pendingStats"
                             :is-expanded="(item as any).isExpanded"
                             @expand="toggleExpand(item.id)"
@@ -279,7 +320,7 @@ const currentViewName = computed(() => {
                             v-else-if="item.type === 'chart'"
                             :title="item.title"
                             :path="item.path"
-                            :data="resolvePath(stats, item.path) ?? []"
+                            :data="item.customFn ? (customResults[item.id] || []) : (resolvePath(stats, item.path) ?? [])"
                             :loading="pendingStats"
                             :is-expanded="(item as any).isExpanded"
                             @expand="toggleExpand(item.id)"
@@ -290,7 +331,7 @@ const currentViewName = computed(() => {
                             v-else-if="item.type === 'pie'"
                             :title="item.title"
                             :path="item.path"
-                            :data="resolvePath(stats, item.path) ?? {}"
+                            :data="item.customFn ? (customResults[item.id] || {}) : (resolvePath(stats, item.path) ?? {})"
                             :loading="pendingStats"
                             :is-expanded="(item as any).isExpanded"
                             @expand="toggleExpand(item.id)"
@@ -307,9 +348,9 @@ const currentViewName = computed(() => {
                             >
                                 <div class="flex items-center gap-4">
                                     <div
-                                        class="drag-handle cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity p-1 -ml-2 rounded hover:bg-zinc-800"
+                                        class="drag-handle cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-all duration-300 p-1.5 -ml-2 rounded-lg hover:bg-white/10 z-20 backdrop-blur-sm border border-transparent hover:border-white/20"
                                     >
-                                        <iconify-icon icon="mdi:drag-variant" class="text-zinc-600"></iconify-icon>
+                                        <iconify-icon icon="mdi:drag-variant" class="text-zinc-500 text-lg"></iconify-icon>
                                     </div>
                                     <h3 class="text-sm font-bold text-zinc-100 uppercase tracking-widest">
                                         Recent Activity
@@ -428,12 +469,6 @@ const currentViewName = computed(() => {
                 </template>
             </draggable>
 
-            <style scoped>
-            .dashboard-grid {
-                background-image: radial-gradient(circle at 1px 1px, #ffffff05 1px, transparent 0);
-                background-size: 40px 40px;
-            }
-            </style>
         </main>
 
         <!-- Modals -->
@@ -473,9 +508,35 @@ const currentViewName = computed(() => {
             :is-open="isSaveViewOpen"
             :current-view-id="currentViewId"
             :view-name="views[currentViewId]?.name"
-            @close="isSaveViewOpen = false"
+            @close="closeSaveView"
             @save="handleSaveView"
+            @minimize="minimizeSaveView"
         />
+
+        <!-- Minimized Save FAB -->
+        <div
+            v-if="isSaveViewMinimized && !focusMode"
+            class="fixed bottom-8 right-8 z-[90] animate-in slide-in-from-bottom-8 fade-in duration-300"
+        >
+            <button
+                @click="isSaveViewOpen = true"
+                class="group flex items-center gap-3 bg-blue-600 hover:bg-blue-500 text-white pl-4 pr-6 py-3 rounded-full shadow-[0_0_40px_-10px_rgba(59,130,246,0.5)] transition-all hover:scale-105 active:scale-95"
+            >
+                <div class="relative">
+                    <iconify-icon icon="mdi:content-save-edit" class="text-xl"></iconify-icon>
+                    <span class="absolute -top-1 -right-1 flex h-2 w-2">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-200 opacity-75"
+                        ></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-100"></span>
+                    </span>
+                </div>
+                <div class="flex flex-col items-start leading-none">
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-70">Unsaved Changes</span>
+                    <span class="text-xs font-bold">{{ currentViewId === 'default' ? 'Save New View' : 'Update ' + currentViewName }}</span>
+                </div>
+            </button>
+        </div>
 
         <!-- Layout Settings Toggle -->
         <button
@@ -495,6 +556,11 @@ const currentViewName = computed(() => {
 body {
     font-family: 'Inter', sans-serif;
     background-color: #050505;
+}
+
+.dashboard-grid {
+    background-image: radial-gradient(circle at 1px 1px, #ffffff05 1px, transparent 0);
+    background-size: 40px 40px;
 }
 
 .line-clamp-1 {

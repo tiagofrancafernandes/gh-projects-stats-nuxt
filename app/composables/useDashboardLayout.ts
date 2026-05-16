@@ -7,6 +7,7 @@ export interface LayoutItem {
     type?: 'stat' | 'chart' | 'gauge' | 'list' | 'pie' | 'group';
     subLabel?: string; // New: editable sub-label
     children?: LayoutItem[]; // New: for nested groups
+    customFn?: string; // New: Custom JS logic
     showValue?: boolean;
     showLabel?: boolean;
     format?: 'fixed' | 'percent';
@@ -22,6 +23,18 @@ export interface DashboardView {
 
 export function useDashboardLayout() {
     const defaultLayout: LayoutItem[] = [
+        {
+            id: 'custom_demo',
+            title: 'Custom Random Value',
+            visible: false,
+            cols: 1,
+            type: 'stat',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+            customFn: 'return Math.floor(Math.random() * 100);',
+        },
         {
             id: 'total',
             title: 'Total Items',
