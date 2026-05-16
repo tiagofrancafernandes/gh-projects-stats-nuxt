@@ -7,6 +7,11 @@ const props = defineProps<{
     isExpanded?: boolean;
     showHandle?: boolean;
     path?: string;
+    showValue?: boolean;
+    showLabel?: boolean;
+    format?: 'fixed' | 'percent';
+    precision?: number;
+    subLabel?: string;
 }>();
 
 const emit = defineEmits(['expand', 'update']);
@@ -14,15 +19,43 @@ const emit = defineEmits(['expand', 'update']);
 const isEditing = ref(false);
 const editTitle = ref(props.title);
 const editPath = ref(props.path || '');
+const editShowValue = ref(props.showValue !== false);
+const editShowLabel = ref(props.showLabel !== false);
+const editFormat = ref(props.format || 'fixed');
+const editPrecision = ref(props.precision ?? 0);
+const editSubLabel = ref(props.subLabel || '');
+
+const formattedValue = computed(() => {
+    let val = Number(props.value);
+    if (isNaN(val)) val = 0;
+
+    if (editFormat.value === 'percent') {
+        return val.toFixed(editPrecision.value) + '%';
+    }
+    return val.toFixed(editPrecision.value);
+});
 
 function save() {
-    emit('update', { title: editTitle.value, path: editPath.value });
+    emit('update', {
+        title: editTitle.value,
+        path: editPath.value,
+        showValue: editShowValue.value,
+        showLabel: editShowLabel.value,
+        format: editFormat.value,
+        precision: editPrecision.value,
+        subLabel: editSubLabel.value,
+    });
     isEditing.value = false;
 }
 
 function cancel() {
     editTitle.value = props.title;
     editPath.value = props.path || '';
+    editShowValue.value = props.showValue !== false;
+    editShowLabel.value = props.showLabel !== false;
+    editFormat.value = props.format || 'fixed';
+    editPrecision.value = props.precision ?? 0;
+    editSubLabel.value = props.subLabel || '';
     isEditing.value = false;
 }
 </script>
@@ -41,18 +74,21 @@ function cancel() {
 
         <div v-if="!isEditing" class="flex flex-col h-full w-full relative z-10">
             <div class="flex items-center justify-between mb-4">
-                <span class="text-zinc-500 text-xs font-bold uppercase tracking-widest">{{ title }}</span>
+                <span v-if="showLabel !== false" class="text-zinc-500 text-xs font-bold uppercase tracking-widest">
+                    {{ title }}
+                </span>
+                <span v-else></span>
                 <div class="flex items-center gap-1">
                     <button
                         @click.stop="isEditing = true"
-                        data-tooltip="Configure"
+                        v-tippy="'Configure'"
                         class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm px-2"
                     >
                         <iconify-icon icon="mdi:cog" class="text-base text-zinc-500"></iconify-icon>
                     </button>
                     <button
                         @click.stop="$emit('expand')"
-                        :data-tooltip="isExpanded ? 'Minimize' : 'Expand'"
+                        v-tippy="isExpanded ? 'Minimize' : 'Expand'"
                         class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm px-2"
                     >
                         <iconify-icon
@@ -66,17 +102,17 @@ function cancel() {
             <div class="flex-1 flex flex-col justify-center">
                 <div v-if="loading" class="h-10 w-32 bg-zinc-800/50 animate-pulse rounded-lg"></div>
                 <div
-                    v-else
+                    v-else-if="showValue !== false"
                     class="font-bold text-zinc-100 tracking-tighter"
                     :class="isExpanded ? 'text-8xl' : 'text-3xl'"
                 >
-                    {{ value }}
+                    {{ formattedValue }}
                 </div>
             </div>
 
-            <div v-if="!loading" class="mt-4 flex items-center gap-2 text-[10px] font-bold text-zinc-500">
-                <span class="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700">LIVE</span>
-                <span>Last updated just now</span>
+            <div v-if="!loading" class="mt-4 flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">
+                <span v-if="!subLabel" class="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700">LIVE</span>
+                <span>{{ subLabel || 'Last updated just now' }}</span>
             </div>
         </div>
 
@@ -89,35 +125,94 @@ function cancel() {
                 </button>
             </div>
 
-            <div class="space-y-4 flex-1">
+            <div class="space-y-4 flex-1 overflow-y-auto pr-2">
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Card Title</label>
                     <input
+                        id="card-title"
+                        name="card-title"
                         v-model="editTitle"
                         type="text"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all"
-                        placeholder="e.g., Total Items"
+                    />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            v-model="editShowValue"
+                            id="showValue"
+                            name="showValue"
+                            class="rounded border-zinc-800 bg-zinc-950 text-blue-500"
+                        />
+                        <label for="showValue" class="text-[10px] font-bold text-zinc-500 uppercase">Show Value</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            v-model="editShowLabel"
+                            id="showLabel"
+                            name="showLabel"
+                            class="rounded border-zinc-800 bg-zinc-950 text-blue-500"
+                        />
+                        <label for="showLabel" class="text-[10px] font-bold text-zinc-500 uppercase">Show Label</label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Format</label>
+                        <select
+                            id="card-format"
+                            name="card-format"
+                            v-model="editFormat"
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100"
+                        >
+                            <option value="fixed">Fixed</option>
+                            <option value="percent">Percentage</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Precision</label>
+                        <input
+                            id="card-precision"
+                            name="card-precision"
+                            type="number"
+                            v-model.number="editPrecision"
+                            min="0"
+                            max="5"
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100"
+                        />
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Sub-label / Units</label>
+                    <input
+                        id="card-sublabel"
+                        name="card-sublabel"
+                        v-model="editSubLabel"
+                        type="text"
+                        placeholder="e.g. Items / Week"
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all"
                     />
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                        Data Path (stats.*)
-                    </label>
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Data Path</label>
                     <input
+                        id="card-path"
+                        name="card-path"
                         v-model="editPath"
                         type="text"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all font-mono"
-                        placeholder="e.g., total"
                     />
-                    <p class="text-[9px] text-zinc-600 font-medium italic">
-                        Example: total, open, closed, weeklyVelocity
-                    </p>
                 </div>
             </div>
 
-            <div class="flex gap-2 pt-4 border-t border-zinc-800">
-                <button @click="save" class="flex-1 btn btn-white btn-sm py-2">Save Changes</button>
+            <div class="flex gap-2 pt-4 border-t border-zinc-800 mt-auto">
+                <button @click="save" class="flex-1 btn btn-white btn-sm py-2">Save</button>
                 <button @click="cancel" class="flex-1 btn btn-ghost btn-sm py-2 border border-zinc-800">Cancel</button>
             </div>
         </div>

@@ -11,6 +11,7 @@ const props = defineProps<{
     loading?: boolean;
     isExpanded?: boolean;
     path?: string;
+    subLabel?: string;
 }>();
 
 const emit = defineEmits(['expand', 'update']);
@@ -18,17 +19,28 @@ const emit = defineEmits(['expand', 'update']);
 const isEditing = ref(false);
 const editTitle = ref(props.title);
 const editPath = ref(props.path || '');
+const editSubLabel = ref(props.subLabel || '');
 
 function save() {
-    emit('update', { title: editTitle.value, path: editPath.value });
+    emit('update', {
+        title: editTitle.value,
+        path: editPath.value,
+        subLabel: editSubLabel.value,
+    });
     isEditing.value = false;
 }
 
-function cancel() {
+const cancel = () => {
     editTitle.value = props.title;
     editPath.value = props.path || '';
+    editSubLabel.value = props.subLabel || '';
     isEditing.value = false;
-}
+};
+
+const displayValue = computed(() => {
+    const val = Number(props.value);
+    return isNaN(val) ? 0 : val;
+});
 
 const chartData = computed(() => ({
     labels: ['Velocity', 'Remaining'],
@@ -79,14 +91,14 @@ const chartOptions = computed(() => ({
                 <div class="flex items-center gap-1">
                     <button
                         @click.stop="isEditing = true"
-                        data-tooltip="Configure"
+                        v-tippy="'Configure'"
                         class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm px-2"
                     >
                         <iconify-icon icon="mdi:cog" class="text-base text-zinc-500"></iconify-icon>
                     </button>
                     <button
                         @click.stop="$emit('expand')"
-                        :data-tooltip="isExpanded ? 'Minimize' : 'Expand'"
+                        v-tippy="isExpanded ? 'Minimize' : 'Expand'"
                         class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm px-2"
                     >
                         <iconify-icon
@@ -108,9 +120,11 @@ const chartOptions = computed(() => ({
                     <!-- Center Text -->
                     <div class="absolute inset-0 flex flex-col items-center justify-center mt-8">
                         <span class="font-bold text-zinc-100 tracking-tighter text-4xl">
-                            {{ value }}
+                            {{ displayValue }}
                         </span>
-                        <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">Items / Week</span>
+                        <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">
+                            {{ subLabel || 'Items / Week' }}
+                        </span>
                     </div>
                 </div>
 
@@ -135,6 +149,8 @@ const chartOptions = computed(() => ({
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Card Title</label>
                     <input
+                        id="gauge-title"
+                        name="gauge-title"
                         v-model="editTitle"
                         type="text"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all"
@@ -142,8 +158,22 @@ const chartOptions = computed(() => ({
                 </div>
 
                 <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Sub-label / Units</label>
+                    <input
+                        id="gauge-sublabel"
+                        name="gauge-sublabel"
+                        v-model="editSubLabel"
+                        type="text"
+                        placeholder="e.g. Items / Week"
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all"
+                    />
+                </div>
+
+                <div class="space-y-1.5">
                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Data Path</label>
                     <input
+                        id="gauge-path"
+                        name="gauge-path"
                         v-model="editPath"
                         type="text"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all font-mono"

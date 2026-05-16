@@ -4,7 +4,13 @@ export interface LayoutItem {
     visible: boolean;
     cols: number; // 1 to 4
     path?: string; // JSON path in stats object
-    type?: 'stat' | 'chart' | 'gauge' | 'list' | 'pie';
+    type?: 'stat' | 'chart' | 'gauge' | 'list' | 'pie' | 'group';
+    subLabel?: string; // New: editable sub-label
+    children?: LayoutItem[]; // New: for nested groups
+    showValue?: boolean;
+    showLabel?: boolean;
+    format?: 'fixed' | 'percent';
+    precision?: number;
 }
 
 export interface DashboardView {
@@ -16,10 +22,54 @@ export interface DashboardView {
 
 export function useDashboardLayout() {
     const defaultLayout: LayoutItem[] = [
-        { id: 'total', title: 'Total Items', visible: true, cols: 1, path: 'total', type: 'stat' },
-        { id: 'open', title: 'Open Items', visible: true, cols: 1, path: 'open', type: 'stat' },
-        { id: 'closed', title: 'Closed Items', visible: true, cols: 1, path: 'closed', type: 'stat' },
-        { id: 'merged', title: 'Merged PRs', visible: true, cols: 1, path: 'merged', type: 'stat' },
+        {
+            id: 'total',
+            title: 'Total Items',
+            visible: true,
+            cols: 1,
+            path: 'total',
+            type: 'stat',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+        },
+        {
+            id: 'open',
+            title: 'Open Items',
+            visible: true,
+            cols: 1,
+            path: 'open',
+            type: 'stat',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+        },
+        {
+            id: 'closed',
+            title: 'Closed Items',
+            visible: true,
+            cols: 1,
+            path: 'closed',
+            type: 'stat',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+        },
+        {
+            id: 'merged',
+            title: 'Merged PRs',
+            visible: true,
+            cols: 1,
+            path: 'merged',
+            type: 'stat',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+        },
         {
             id: 'velocity_gauge',
             title: 'Current Velocity',
@@ -27,8 +77,13 @@ export function useDashboardLayout() {
             cols: 1,
             path: 'weeklyVelocity',
             type: 'gauge',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+            subLabel: 'Items / Week',
         },
-        { id: 'velocity', title: 'Velocity Chart', visible: true, cols: 3, path: 'velocity', type: 'chart' },
+        { id: 'velocity', title: 'Velocity Chart', visible: true, cols: 3, path: 'velocity', type: 'gauge' },
         { id: 'status', title: 'Status Chart', visible: true, cols: 2, path: 'byStatus', type: 'pie' },
         { id: 'labels', title: 'Labels Chart', visible: true, cols: 2, path: 'byLabel', type: 'pie' },
         { id: 'activity', title: 'Recent Activity', visible: true, cols: 4, type: 'list' },
@@ -109,6 +164,48 @@ export function useDashboardLayout() {
         if (currentViewId.value === id) currentViewId.value = 'default';
     }
 
+    function cloneView(id: string) {
+        const view = views.value[id];
+        if (view) {
+            const newName = `${view.name} (Copy)`;
+            const newId = `${id}-copy-${Date.now()}`;
+            views.value[newId] = {
+                ...JSON.parse(JSON.stringify(view)),
+                id: newId,
+                name: newName,
+            };
+        }
+    }
+
+    function addItem(type: LayoutItem['type'] = 'stat') {
+        const id = `custom-${Date.now()}`;
+        const item: LayoutItem = {
+            id,
+            title: type === 'group' ? 'New Group' : 'New Card',
+            visible: true,
+            cols: type === 'group' ? 2 : 1,
+            type,
+            path: '',
+            showValue: true,
+            showLabel: true,
+            format: 'fixed',
+            precision: 0,
+        };
+
+        if (type === 'group') {
+            item.children = [];
+        }
+
+        layout.value.push(item);
+    }
+
+    function removeItem(id: string) {
+        const index = layout.value.findIndex((i) => i.id === id);
+        if (index > -1) {
+            layout.value.splice(index, 1);
+        }
+    }
+
     function exportConfig() {
         const data = {
             layout: layout.value,
@@ -139,8 +236,18 @@ export function useDashboardLayout() {
     }
 
     function updateItem(id: string, updates: Partial<LayoutItem>) {
-        const item = layout.value.find((i) => i.id === id);
-        if (item) Object.assign(item, updates);
+        const findAndUpdate = (items: LayoutItem[]): boolean => {
+            const item = items.find((i) => i.id === id);
+            if (item) {
+                Object.assign(item, updates);
+                return true;
+            }
+            for (const i of items) {
+                if (i.children && findAndUpdate(i.children)) return true;
+            }
+            return false;
+        };
+        findAndUpdate(layout.value);
     }
 
     return {
@@ -154,6 +261,9 @@ export function useDashboardLayout() {
         saveView,
         loadView,
         deleteView,
+        cloneView,
+        addItem,
+        removeItem,
         exportConfig,
         importConfig,
     };

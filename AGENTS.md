@@ -11,6 +11,7 @@ This document provides mandatory instructions for AI coding assistants working o
     *   **Else-less**: Avoid `else` blocks whenever possible.
     *   **Explicit Braces**: Never omit braces in control structures.
 4.  **Backend Safety**: When modifying routes, ensure environment variables (like `GITHUB_TOKEN`) are correctly handled and errors are logged but not exposed to the client.
+5.  **Resource Management**: Always clear timers (`setInterval`, `setTimeout`) on component unmount (`onUnmounted`) or when dependent state changes to prevent memory leaks and redundant processing.
 
 ## 🎨 UI & Design Rules
 

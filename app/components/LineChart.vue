@@ -40,33 +40,36 @@ function cancel() {
     isEditing.value = false;
 }
 
-const chartData = computed(() => ({
-    labels: props.data?.map((d: any) => d.date) || [],
-    datasets: [
-        {
-            label: 'Items',
-            data: props.data?.map((d: any) => d.closed) || [],
-            borderColor: '#3b82f6',
-            backgroundColor: (context: any) => {
-                const chart = context.chart;
-                const { ctx, chartArea } = chart;
-                if (!chartArea) return null;
-                const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                gradient.addColorStop(0, 'rgba(59, 130, 246, 0)');
-                gradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
-                return gradient;
+const chartData = computed(() => {
+    const dataArray = Array.isArray(props.data) ? props.data : [];
+    return {
+        labels: dataArray.map((d: any) => d.date) || [],
+        datasets: [
+            {
+                label: 'Items',
+                data: dataArray.map((d: any) => d.closed) || [],
+                borderColor: '#3b82f6',
+                backgroundColor: (context: any) => {
+                    const chart = context.chart;
+                    const { ctx, chartArea } = chart;
+                    if (!chartArea) return null;
+                    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                    gradient.addColorStop(0, 'rgba(59, 130, 246, 0)');
+                    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
+                    return gradient;
+                },
+                fill: true,
+                tension: 0.4,
+                pointRadius: props.isExpanded ? 6 : 4,
+                pointHoverRadius: props.isExpanded ? 8 : 6,
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#09090b',
+                pointBorderWidth: 2,
+                borderWidth: 3,
             },
-            fill: true,
-            tension: 0.4,
-            pointRadius: props.isExpanded ? 6 : 4,
-            pointHoverRadius: props.isExpanded ? 8 : 6,
-            pointBackgroundColor: '#3b82f6',
-            pointBorderColor: '#09090b',
-            pointBorderWidth: 2,
-            borderWidth: 3,
-        },
-    ],
-}));
+        ],
+    };
+});
 
 const chartOptions = computed(() => ({
     responsive: true,
@@ -114,14 +117,14 @@ const chartOptions = computed(() => ({
                 <div class="flex items-center gap-1">
                     <button
                         @click.stop="isEditing = true"
-                        data-tooltip="Configure"
+                        v-tippy="'Configure'"
                         class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm px-2"
                     >
                         <iconify-icon icon="mdi:cog" class="text-base text-zinc-500"></iconify-icon>
                     </button>
                     <button
                         @click.stop="$emit('expand')"
-                        :data-tooltip="isExpanded ? 'Minimize' : 'Expand'"
+                        v-tippy="isExpanded ? 'Minimize' : 'Expand'"
                         class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm px-2"
                     >
                         <iconify-icon
@@ -153,6 +156,8 @@ const chartOptions = computed(() => ({
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Card Title</label>
                     <input
+                        id="line-title"
+                        name="line-title"
                         v-model="editTitle"
                         type="text"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all"
@@ -162,6 +167,8 @@ const chartOptions = computed(() => ({
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Data Path</label>
                     <input
+                        id="line-path"
+                        name="line-path"
                         v-model="editPath"
                         type="text"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all font-mono"

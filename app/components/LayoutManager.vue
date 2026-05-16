@@ -17,6 +17,9 @@ const emit = defineEmits([
     'saveView',
     'loadView',
     'deleteView',
+    'cloneView',
+    'addItem',
+    'removeItem',
     'setRefreshInterval',
     'export',
     'import',
@@ -96,62 +99,110 @@ function moveItem(index: number, direction: 'up' | 'down') {
             <!-- Body -->
             <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
                 <!-- Cards Tab -->
-                <div v-if="activeTab === 'cards'" class="space-y-4">
-                    <div
-                        v-for="(item, index) in layout"
-                        :key="item.id"
-                        class="group flex items-center gap-4 p-3 rounded-lg bg-zinc-900/40 border border-zinc-800 hover:border-zinc-700 transition-all"
-                    >
-                        <!-- Drag/Move Handles -->
-                        <div class="flex flex-col gap-1">
+                <div v-if="activeTab === 'cards'" class="space-y-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold text-zinc-500 uppercase tracking-widest">Dashboard Cards</label>
+                        <div class="flex gap-2">
                             <button
-                                @click="moveItem(index, 'up')"
-                                :disabled="index === 0"
-                                class="p-1 rounded hover:bg-zinc-800 text-zinc-600 hover:text-zinc-300 disabled:opacity-20"
+                                @click="emit('addItem', 'stat')"
+                                class="btn btn-black btn-sm text-[10px] py-1"
+                                v-tippy="'Add Metric'"
                             >
-                                <iconify-icon icon="mdi:chevron-up"></iconify-icon>
+                                + Stat
                             </button>
                             <button
-                                @click="moveItem(index, 'down')"
-                                :disabled="index === layout.length - 1"
-                                class="p-1 rounded hover:bg-zinc-800 text-zinc-600 hover:text-zinc-300 disabled:opacity-20"
+                                @click="emit('addItem', 'gauge')"
+                                class="btn btn-black btn-sm text-[10px] py-1"
+                                v-tippy="'Add Gauge'"
                             >
-                                <iconify-icon icon="mdi:chevron-down"></iconify-icon>
+                                + Gauge
+                            </button>
+                            <button
+                                @click="emit('addItem', 'group')"
+                                class="btn btn-black btn-sm text-[10px] py-1"
+                                v-tippy="'Add Group Container'"
+                            >
+                                + Group
+                            </button>
+                            <button
+                                @click="emit('addItem', 'pie')"
+                                class="btn btn-black btn-sm text-[10px] py-1"
+                                v-tippy="'Add Chart'"
+                            >
+                                + Chart
                             </button>
                         </div>
-
-                        <!-- Visibility -->
-                        <button
-                            @click="emit('toggleVisibility', item.id)"
-                            class="btn btn-outline p-2.5"
-                            :class="{ 'text-white border-zinc-500': item.visible }"
+                    </div>
+                    <div class="space-y-4">
+                        <div
+                            v-for="(item, index) in layout"
+                            :key="item.id"
+                            class="group flex items-center gap-4 p-3 rounded-lg bg-zinc-900/40 border border-zinc-800 hover:border-zinc-700 transition-all"
                         >
-                            <iconify-icon
-                                :icon="item.visible ? 'mdi:eye' : 'mdi:eye-off'"
-                                class="text-lg"
-                            ></iconify-icon>
-                        </button>
-
-                        <!-- Title -->
-                        <div class="flex-1 min-w-0">
-                            <div class="text-sm font-bold text-zinc-100 truncate">{{ item.title }}</div>
-                            <div class="text-[10px] text-zinc-600 uppercase font-bold tracking-tighter">
-                                ID: {{ item.id }}
+                            <!-- Drag/Move Handles -->
+                            <div class="flex flex-col gap-1">
+                                <button
+                                    @click="moveItem(index, 'up')"
+                                    :disabled="index === 0"
+                                    class="p-1 rounded hover:bg-zinc-800 text-zinc-600 hover:text-zinc-300 disabled:opacity-20"
+                                >
+                                    <iconify-icon icon="mdi:chevron-up"></iconify-icon>
+                                </button>
+                                <button
+                                    @click="moveItem(index, 'down')"
+                                    :disabled="index === layout.length - 1"
+                                    class="p-1 rounded hover:bg-zinc-800 text-zinc-600 hover:text-zinc-300 disabled:opacity-20"
+                                >
+                                    <iconify-icon icon="mdi:chevron-down"></iconify-icon>
+                                </button>
                             </div>
-                        </div>
 
-                        <!-- Width Selector -->
-                        <div class="flex items-center gap-1 bg-zinc-950 p-1 rounded-md border border-zinc-800">
+                            <!-- Visibility -->
                             <button
-                                v-for="w in 4"
-                                :key="w"
-                                @click="emit('setCols', item.id, w)"
-                                :class="[
-                                    'px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all',
-                                    item.cols === w ? 'bg-zinc-800 text-white' : 'text-zinc-600 hover:text-zinc-400',
-                                ]"
+                                @click="emit('toggleVisibility', item.id)"
+                                class="btn btn-outline p-2.5"
+                                :class="{ 'text-white border-zinc-500': item.visible }"
                             >
-                                {{ w }}/4
+                                <iconify-icon
+                                    :icon="item.visible ? 'mdi:eye' : 'mdi:eye-off'"
+                                    class="text-lg"
+                                ></iconify-icon>
+                            </button>
+
+                            <!-- Title -->
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-bold text-zinc-100 truncate">{{ item.title }}</div>
+                                <div class="text-[10px] text-zinc-600 uppercase font-bold tracking-tighter">
+                                    ID: {{ item.id }}
+                                    <span v-if="item.subLabel" class="ml-2 text-blue-500/50">• {{ item.subLabel }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Width Selector -->
+                            <div class="flex items-center gap-1 bg-zinc-950 p-1 rounded-md border border-zinc-800">
+                                <button
+                                    v-for="w in 4"
+                                    :key="w"
+                                    @click="emit('setCols', item.id, w)"
+                                    :class="[
+                                        'px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all',
+                                        item.cols === w
+                                            ? 'bg-zinc-800 text-white'
+                                            : 'text-zinc-600 hover:text-zinc-400',
+                                    ]"
+                                >
+                                    {{ w }}/4
+                                </button>
+                            </div>
+
+                            <!-- Remove (only for custom cards) -->
+                            <button
+                                v-if="item.id.startsWith('custom-')"
+                                @click="emit('removeItem', item.id)"
+                                class="p-2 rounded-lg text-zinc-600 hover:text-red-500 transition-all"
+                                v-tippy="'Remove Card'"
+                            >
+                                <iconify-icon icon="mdi:trash-can-outline"></iconify-icon>
                             </button>
                         </div>
                     </div>
@@ -166,6 +217,8 @@ function moveItem(index: number, direction: 'up' | 'down') {
                         </label>
                         <div class="flex gap-2">
                             <input
+                                id="new-view-name"
+                                name="new-view-name"
                                 v-model="newViewName"
                                 type="text"
                                 placeholder="View name (e.g. CEO Overview)"
@@ -221,8 +274,16 @@ function moveItem(index: number, direction: 'up' | 'down') {
                                         Load
                                     </button>
                                     <button
+                                        @click="emit('cloneView', view.id)"
+                                        class="p-2 rounded-lg text-zinc-600 hover:text-blue-500 transition-all"
+                                        v-tippy="'Clone View'"
+                                    >
+                                        <iconify-icon icon="mdi:content-copy"></iconify-icon>
+                                    </button>
+                                    <button
                                         @click="emit('deleteView', view.id)"
                                         class="p-2 rounded-lg text-zinc-600 hover:text-red-500 transition-all"
+                                        v-tippy="'Delete View'"
                                     >
                                         <iconify-icon icon="mdi:delete-outline"></iconify-icon>
                                     </button>
@@ -243,6 +304,8 @@ function moveItem(index: number, direction: 'up' | 'down') {
                             <span class="text-blue-500 font-mono text-sm font-bold">{{ refreshInterval / 1000 }}s</span>
                         </div>
                         <input
+                            id="refresh-interval"
+                            name="refresh-interval"
                             type="range"
                             min="5000"
                             max="300000"

@@ -22,8 +22,8 @@ const router = useRouter();
                 does not exist or might have been removed.
             </p>
             <div class="mt-6 flex gap-4">
-                <Button variant="outline" @click="router.back()">Go Back</Button>
-                <Button @click="router.push('/')">Back to Home</Button>
+                <button class="btn btn-ghost btn-sm px-6" @click="router.back()">Go Back</button>
+                <button class="btn btn-white btn-sm px-6" @click="router.push('/')">Back to Home</button>
             </div>
         </div>
     </div>

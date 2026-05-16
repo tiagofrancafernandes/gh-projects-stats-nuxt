@@ -19,6 +19,9 @@ const {
     saveView,
     loadView,
     deleteView,
+    cloneView,
+    addItem,
+    removeItem,
     exportConfig,
     importConfig,
 } = useDashboardLayout();
@@ -35,8 +38,15 @@ const itemSearch = ref('');
 
 // Dynamic auto refresh
 let refreshTimer: any = null;
+function clearRefreshTimer() {
+    if (refreshTimer) {
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+    }
+}
+
 function startRefreshTimer() {
-    if (refreshTimer) clearInterval(refreshTimer);
+    clearRefreshTimer();
     refreshTimer = setInterval(() => {
         if (!pendingCards.value && !pendingStats.value) {
             refresh();
@@ -48,6 +58,19 @@ onMounted(() => {
     startRefreshTimer();
     const route = useRoute();
     if (route.query.view === 'tv') focusMode.value = true;
+});
+
+onUnmounted(() => {
+    clearRefreshTimer();
+});
+
+watch(refreshInterval, () => {
+    startRefreshTimer();
+});
+
+watch(currentViewId, () => {
+    // Re-sync timer when switching views as interval might change
+    startRefreshTimer();
 });
 
 watch(focusMode, (val) => {
@@ -91,9 +114,22 @@ const colSpanClasses: Record<number, string> = {
     4: 'col-span-1 md:col-span-4',
 };
 
-function handleReorder(newLayout: any[]) {
-    layout.value = newLayout;
+import draggable from 'vuedraggable';
+
+const isSaveViewOpen = ref(false);
+
+function handleDragEnd() {
+    isSaveViewOpen.value = true;
 }
+
+function handleSaveView(name: string) {
+    saveView(name);
+    isSaveViewOpen.value = false;
+}
+
+const currentViewName = computed(() => {
+    return views.value[currentViewId.value]?.name || 'Default View';
+});
 </script>
 
 <template>
@@ -124,10 +160,21 @@ function handleReorder(newLayout: any[]) {
                             </div>
                         </div>
                     </NuxtLink>
+
+                    <div class="h-8 w-px bg-zinc-800 hidden md:block"></div>
+
+                    <div
+                        class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 border border-zinc-800 rounded-full"
+                    >
+                        <iconify-icon icon="mdi:view-dashboard-outline" class="text-blue-500"></iconify-icon>
+                        <span class="text-xs font-bold text-zinc-100 uppercase tracking-wider">
+                            {{ currentViewName }}
+                        </span>
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <button @click="refresh" data-tooltip="Refresh" class="btn btn-ghost">
+                    <button @click="refresh" v-tippy="'Refresh'" class="btn btn-ghost">
                         <iconify-icon
                             icon="mdi:refresh"
                             :class="{ 'animate-spin': pendingCards || pendingStats }"
@@ -137,15 +184,15 @@ function handleReorder(newLayout: any[]) {
 
                     <div class="h-4 w-px bg-zinc-800 mx-1"></div>
 
-                    <button @click="focusMode = true" data-tooltip="TV Mode" class="btn btn-ghost">
+                    <button @click="focusMode = true" v-tippy="'TV Mode'" class="btn btn-ghost">
                         <iconify-icon icon="mdi:monitor-dashboard" class="text-lg"></iconify-icon>
                     </button>
 
-                    <button @click="isLayoutOpen = true" data-tooltip="Customize Layout" class="btn btn-ghost">
+                    <button @click="isLayoutOpen = true" v-tippy="'Customize Layout'" class="btn btn-ghost">
                         <iconify-icon icon="mdi:view-dashboard-edit" class="text-lg"></iconify-icon>
                     </button>
 
-                    <button @click="isFiltersOpen = true" data-tooltip="Filters" class="btn btn-white btn-sm">
+                    <button @click="isFiltersOpen = true" v-tippy="'Filters'" class="btn btn-white btn-sm">
                         <iconify-icon icon="mdi:filter-variant" class="text-base"></iconify-icon>
                         <span class="text-xs">Filters</span>
                     </button>
@@ -160,7 +207,7 @@ function handleReorder(newLayout: any[]) {
         >
             <button
                 @click="focusMode = false"
-                data-tooltip="Exit TV Mode"
+                v-tippy="'Exit TV Mode'"
                 class="pointer-events-auto btn btn-black px-6 shadow-2xl opacity-0 group-hover:opacity-100 translate-y-[-20px] group-hover:translate-y-0"
             >
                 <iconify-icon icon="mdi:close" class="text-lg"></iconify-icon>
@@ -171,8 +218,14 @@ function handleReorder(newLayout: any[]) {
         <!-- Main Dashboard Content -->
         <main class="max-w-7xl mx-auto px-8 transition-all duration-500" :class="[focusMode ? 'pt-8' : 'pt-28 pb-20']">
             <!-- Layout Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <template v-for="item in layout" :key="item.id">
+            <draggable
+                v-model="layout"
+                item-key="id"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                handle=".drag-handle"
+                @end="handleDragEnd"
+            >
+                <template #item="{ element: item }">
                     <div
                         v-if="item.visible"
                         :class="[
@@ -187,6 +240,11 @@ function handleReorder(newLayout: any[]) {
                             :value="resolvePath(stats, item.path) ?? 0"
                             :loading="pendingStats"
                             :is-expanded="(item as any).isExpanded"
+                            :show-value="item.showValue"
+                            :show-label="item.showLabel"
+                            :format="item.format"
+                            :precision="item.precision"
+                            :sub-label="item.subLabel"
                             @expand="toggleExpand(item.id)"
                             @update="updateItem(item.id, $event)"
                         />
@@ -199,8 +257,22 @@ function handleReorder(newLayout: any[]) {
                             :max="50"
                             :loading="pendingStats"
                             :is-expanded="(item as any).isExpanded"
+                            :sub-label="item.subLabel"
                             @expand="toggleExpand(item.id)"
                             @update="updateItem(item.id, $event)"
+                        />
+
+                        <GroupCard
+                            v-else-if="item.type === 'group'"
+                            :id="item.id"
+                            :title="item.title"
+                            :children="item.children || []"
+                            :stats="stats"
+                            :loading="pendingStats"
+                            :is-expanded="(item as any).isExpanded"
+                            @expand="toggleExpand(item.id)"
+                            @update="updateItem(item.id, $event)"
+                            @update-child="updateItem"
                         />
 
                         <LineChart
@@ -229,10 +301,16 @@ function handleReorder(newLayout: any[]) {
                             v-else-if="item.type === 'list'"
                             class="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl flex flex-col h-full group relative"
                         >
+                            <!-- List content -->
                             <div
                                 class="p-6 border-b border-zinc-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4"
                             >
                                 <div class="flex items-center gap-4">
+                                    <div
+                                        class="drag-handle cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity p-1 -ml-2 rounded hover:bg-zinc-800"
+                                    >
+                                        <iconify-icon icon="mdi:drag-variant" class="text-zinc-600"></iconify-icon>
+                                    </div>
                                     <h3 class="text-sm font-bold text-zinc-100 uppercase tracking-widest">
                                         Recent Activity
                                     </h3>
@@ -256,6 +334,7 @@ function handleReorder(newLayout: any[]) {
                                 </div>
                             </div>
 
+                            <!-- Table container -->
                             <div class="overflow-x-auto flex-1">
                                 <table class="w-full text-left">
                                     <thead
@@ -337,9 +416,24 @@ function handleReorder(newLayout: any[]) {
                                 </table>
                             </div>
                         </div>
+
+                        <!-- Drag Handle -->
+                        <div
+                            v-if="item.type !== 'list'"
+                            class="drag-handle absolute top-4 left-4 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-all duration-300 p-1.5 rounded-lg hover:bg-white/10 z-20 backdrop-blur-sm border border-transparent hover:border-white/20"
+                        >
+                            <iconify-icon icon="mdi:drag-variant" class="text-zinc-500 text-lg"></iconify-icon>
+                        </div>
                     </div>
                 </template>
-            </div>
+            </draggable>
+
+            <style scoped>
+            .dashboard-grid {
+                background-image: radial-gradient(circle at 1px 1px, #ffffff05 1px, transparent 0);
+                background-size: 40px 40px;
+            }
+            </style>
         </main>
 
         <!-- Modals -->
@@ -363,20 +457,31 @@ function handleReorder(newLayout: any[]) {
             @close="isLayoutOpen = false"
             @toggle-visibility="toggleVisibility"
             @set-cols="setCols"
-            @reorder="handleReorder"
+            @reorder="layout = $event"
             @save-view="saveView"
             @load-view="loadView"
             @delete-view="deleteView"
+            @clone-view="cloneView"
+            @add-item="addItem"
+            @remove-item="removeItem"
             @set-refresh-interval="refreshInterval = $event"
             @export="exportConfig"
             @import="importConfig"
+        />
+
+        <SaveViewModal
+            :is-open="isSaveViewOpen"
+            :current-view-id="currentViewId"
+            :view-name="views[currentViewId]?.name"
+            @close="isSaveViewOpen = false"
+            @save="handleSaveView"
         />
 
         <!-- Layout Settings Toggle -->
         <button
             v-if="!focusMode"
             @click="isLayoutOpen = true"
-            data-tooltip="Customize Layout"
+            v-tippy="'Customize Layout'"
             class="fixed bottom-8 left-8 btn btn-black p-3 shadow-2xl"
         >
             <iconify-icon icon="mdi:view-dashboard-edit" class="text-xl"></iconify-icon>

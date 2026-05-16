@@ -30,28 +30,31 @@ function cancel() {
     isEditing.value = false;
 }
 
-const chartData = computed(() => ({
-    labels: props.data ? Object.keys(props.data) : [],
-    datasets: [
-        {
-            backgroundColor: [
-                '#3b82f6',
-                '#8b5cf6',
-                '#ec4899',
-                '#f97316',
-                '#eab308',
-                '#22c55e',
-                '#06b6d4',
-                '#6366f1',
-                '#a855f7',
-                '#f43f5e',
-            ],
-            data: props.data ? Object.values(props.data) : [],
-            borderWidth: 0,
-            hoverOffset: 15,
-        },
-    ],
-}));
+const chartData = computed(() => {
+    const dataObj = props.data && typeof props.data === 'object' && !Array.isArray(props.data) ? props.data : {};
+    return {
+        labels: Object.keys(dataObj),
+        datasets: [
+            {
+                backgroundColor: [
+                    '#3b82f6',
+                    '#8b5cf6',
+                    '#ec4899',
+                    '#f97316',
+                    '#eab308',
+                    '#22c55e',
+                    '#06b6d4',
+                    '#6366f1',
+                    '#a855f7',
+                    '#f43f5e',
+                ],
+                data: props.data ? Object.values(props.data) : [],
+                borderWidth: 0,
+                hoverOffset: 15,
+            },
+        ],
+    };
+});
 
 const chartOptions = computed(() => ({
     responsive: true,
@@ -93,14 +96,14 @@ const chartOptions = computed(() => ({
                 <div class="flex items-center gap-1">
                     <button
                         @click.stop="isEditing = true"
-                        data-tooltip="Configure"
+                        v-tippy="'Configure'"
                         class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm px-2"
                     >
                         <iconify-icon icon="mdi:cog" class="text-base text-zinc-500"></iconify-icon>
                     </button>
                     <button
                         @click.stop="$emit('expand')"
-                        :data-tooltip="isExpanded ? 'Minimize' : 'Expand'"
+                        v-tippy="isExpanded ? 'Minimize' : 'Expand'"
                         class="opacity-0 group-hover:opacity-100 btn btn-ghost btn-sm px-2"
                     >
                         <iconify-icon
@@ -132,6 +135,8 @@ const chartOptions = computed(() => ({
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Card Title</label>
                     <input
+                        id="pie-title"
+                        name="pie-title"
                         v-model="editTitle"
                         type="text"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all"
@@ -141,6 +146,8 @@ const chartOptions = computed(() => ({
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Data Path</label>
                     <input
+                        id="pie-path"
+                        name="pie-path"
                         v-model="editPath"
                         type="text"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 transition-all font-mono"
