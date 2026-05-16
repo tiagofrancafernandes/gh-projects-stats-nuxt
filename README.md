@@ -49,12 +49,20 @@ The easiest way to deploy this dashboard is using Vercel. Click the button above
 
 **Important**: You must provide the following environment variables during deployment (or add them later and trigger a redeploy):
 
-| Variable | Description |
-| :--- | :--- |
-| `GITHUB_TOKEN` | Your GitHub Personal Access Token with `project` scopes. |
-| `DEFAULT_GITHUB_OWNER` | Default GitHub username or organization name. |
-| `DEFAULT_GITHUB_ORG` | (Alias for Owner) Default GitHub organization name. |
 | `DEFAULT_GITHUB_PROJECT` | Default project number (e.g., `1`). |
+
+### Access Control & Filtering
+
+You can restrict which organizations and projects are visible and accessible in the dashboard using the following environment variables (values are comma-separated):
+
+- **Organizations/Users**:
+    - `ALLOWED_ORGS`: Show **only** these organizations or users.
+    - `EXCLUDED_ORGS`: Hide these specific organizations or users.
+- **Projects**:
+    - `ALLOWED_PROJECTS`: Show **only** these project numbers or titles.
+    - `EXCLUDED_PROJECTS`: Hide these specific project numbers or titles.
+
+*Note: Access control is enforced at the API level. Even if a user knows the URL, they will be blocked from accessing unauthorized data.*
 
 ### Environment Variables (.env)
 

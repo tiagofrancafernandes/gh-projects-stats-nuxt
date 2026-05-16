@@ -9,5 +9,10 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    return await fetchGithubProjects(owner, event);
+    if (!isOrgAllowed(owner, event)) {
+        return [];
+    }
+
+    const projects = await fetchGithubProjects(owner, event);
+    return projects.filter(p => isProjectAllowed(p.number, event) || isProjectAllowed(p.title, event));
 });
