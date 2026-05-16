@@ -190,7 +190,7 @@ function handleDragEnd() {
         <button
             v-if="focusMode"
             @click="focusMode = false"
-            class="fixed bottom-8 right-8 z-50 p-4 rounded-full bg-zinc-900/80 backdrop-blur border border-zinc-800 text-zinc-500 hover:text-white transition-all opacity-0 hover:opacity-100"
+            class="fixed bottom-8 right-8 z-50 p-4 rounded-full bg-zinc-900/80 backdrop-blur border border-zinc-800 text-zinc-500 hover:text-white transition-all opacity-20 hover:opacity-100"
         >
             <iconify-icon icon="mdi:close" class="text-2xl"></iconify-icon>
         </button>
