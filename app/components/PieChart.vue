@@ -9,6 +9,7 @@ const props = defineProps<{
     title: string;
     loading?: boolean;
     isExpanded?: boolean;
+    showHandle?: boolean;
 }>();
 
 defineEmits(['expand']);
@@ -70,6 +71,14 @@ const chartOptions = computed(() => ({
     <div
         class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-2xl p-6 h-full flex flex-col group relative overflow-hidden"
     >
+        <!-- Drag Handle -->
+        <div
+            v-if="showHandle"
+            class="absolute left-1/2 -top-1 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-move z-20"
+        >
+            <iconify-icon icon="mdi:drag-horizontal" class="text-2xl text-zinc-600"></iconify-icon>
+        </div>
+
         <div class="flex items-center justify-between mb-8 relative z-10">
             <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest">{{ title }}</h3>
             <button

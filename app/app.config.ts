@@ -1,6 +1,6 @@
 export default defineAppConfig({
-    name: 'MKPay Backoffice',
-    description: 'Sistema Administrativo MKPay',
+    name: 'GH Insights',
+    description: 'GH Insights and Dashboards',
     version: '1.0.0',
     icon: {
         size: '', // default <Icon> size applied

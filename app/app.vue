@@ -14,9 +14,9 @@ useHead({
     },
 });
 
-const title = 'MKPay Backoffice - Plataforma Administrativa';
+const title = 'GH Insights - Plataforma Administrativa';
 const description =
-    'Sistema administrativo MKPay para gestão de clientes, aprovação de contas, integrações de pagamento e configurações da plataforma.';
+    'GH Insights and Dashboards para gestão de clientes, aprovação de contas, integrações de pagamento e configurações da plataforma.';
 
 useSeoMeta({
     title,
