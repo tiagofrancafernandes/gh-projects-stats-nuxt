@@ -71,6 +71,7 @@ function clearRefreshTimer() {
 
 function startRefreshTimer() {
     clearRefreshTimer();
+    if (refreshInterval.value === 0) return;
     refreshTimer = setInterval(() => {
         if (!pendingCards.value && !pendingStats.value) {
             refresh();

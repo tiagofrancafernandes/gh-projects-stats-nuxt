@@ -58,6 +58,15 @@ function moveItem(index: number, direction: 'up' | 'down') {
         emit('reorder', newLayout);
     }
 }
+
+function formatRefreshInterval(ms: number) {
+    if (ms === 0) return 'Disabled';
+    const seconds = ms / 1000;
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+}
 </script>
 
 <template>
@@ -303,22 +312,24 @@ function moveItem(index: number, direction: 'up' | 'down') {
                             <label class="text-xs font-bold text-zinc-500 uppercase tracking-widest">
                                 Auto Refresh
                             </label>
-                            <span class="text-blue-500 font-mono text-sm font-bold">{{ refreshInterval / 1000 }}s</span>
+                            <span class="text-blue-500 font-mono text-sm font-bold">
+                                {{ formatRefreshInterval(refreshInterval) }}
+                            </span>
                         </div>
                         <input
                             id="refresh-interval"
                             name="refresh-interval"
                             type="range"
-                            min="5000"
-                            max="300000"
+                            min="0"
+                            max="900000"
                             step="5000"
                             :value="refreshInterval"
                             @input="(e) => emit('setRefreshInterval', parseInt((e.target as HTMLInputElement).value))"
                             class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
                         />
                         <div class="flex justify-between text-[10px] text-zinc-600 font-bold">
-                            <span>5s</span>
-                            <span>5min</span>
+                            <span>Disabled</span>
+                            <span>15min</span>
                         </div>
                     </div>
 
