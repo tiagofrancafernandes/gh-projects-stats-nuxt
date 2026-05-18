@@ -14,9 +14,9 @@ useHead({
     },
 });
 
-const title = 'GH Insights - Plataforma Administrativa';
+const title = 'GH Insights';
 const description =
-    'GH Insights and Dashboards para gestão de clientes, aprovação de contas, integrações de pagamento e configurações da plataforma.';
+    'Painel de alta performance para visualizar e analisar métricas de projetos do GitHub (Projects v2) com layouts customizáveis, métricas programáveis e modo TV.';
 
 useSeoMeta({
     title,
