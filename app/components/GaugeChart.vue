@@ -82,7 +82,7 @@ const chartOptions = computed(() => ({
 
 <template>
     <div
-        class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-xl p-6 h-full flex flex-col group relative overflow-hidden"
+        class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-xl p-6 h-full flex flex-col group relative overflow-hidden min-h-[250px]"
     >
         <!-- Decoration -->
         <div class="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">

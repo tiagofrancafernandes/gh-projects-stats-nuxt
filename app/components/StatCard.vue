@@ -68,7 +68,7 @@ function cancel() {
 
 <template>
     <div
-        class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all group relative h-full flex flex-col"
+        class="bg-zinc-900/40 backdrop-blur-md border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all group relative h-full flex flex-col min-h-[140px]"
         :class="{ 'justify-center items-center': isExpanded && !isEditing }"
     >
         <!-- Decoration Container -->
