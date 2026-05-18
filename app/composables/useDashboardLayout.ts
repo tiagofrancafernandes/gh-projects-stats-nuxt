@@ -105,7 +105,7 @@ export function useDashboardLayout() {
     const layout = ref<LayoutItem[]>([]);
     const views = ref<Record<string, DashboardView>>({});
     const currentViewId = ref<string>('default');
-    const refreshInterval = ref<number>(30000); // 30s default
+    const refreshInterval = ref<number>(15000); // 15s default
 
     function saveToStorage() {
         const data = {
@@ -124,7 +124,7 @@ export function useDashboardLayout() {
                 const parsed = JSON.parse(saved);
                 views.value = parsed.views || {};
                 currentViewId.value = parsed.currentViewId || 'default';
-                refreshInterval.value = parsed.refreshInterval || 30000;
+                refreshInterval.value = typeof parsed.refreshInterval === 'number' ? parsed.refreshInterval : 15000;
 
                 // Load current layout or fallback
                 const savedLayout = parsed.layout;

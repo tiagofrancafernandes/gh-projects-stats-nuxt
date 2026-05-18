@@ -7,16 +7,16 @@ useHead({
     meta: [{ charset: 'utf-8' }, { name: 'viewport', content: 'width=device-width, initial-scale=1' }],
     link: [{ rel: 'icon', href: '/favicon.ico' }],
     htmlAttrs: {
-        lang: 'pt-BR',
+        lang: 'en',
     },
     bodyAttrs: {
         class: computed(() => `body-computed-class theme-color-${theme.color}`),
     },
 });
 
-const title = 'GH Insights - Plataforma Administrativa';
+const title = 'GH Insights';
 const description =
-    'GH Insights and Dashboards para gestão de clientes, aprovação de contas, integrações de pagamento e configurações da plataforma.';
+    'High-performance dashboard to visualize and analyze GitHub Projects v2 metrics with customizable layouts, programmable metrics, and TV mode.';
 
 useSeoMeta({
     title,

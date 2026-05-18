@@ -72,5 +72,8 @@ export function aggregateStats(cards: GithubCard[]): GithubStats {
         .filter((v) => v.date >= sevenDaysAgoStr)
         .reduce((acc, v) => acc + v.closed, 0);
 
+    stats.availableStatuses = Object.keys(stats.byStatus);
+    stats.availableLabels = Object.keys(stats.byLabel);
+
     return stats;
 }
